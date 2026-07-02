@@ -84,20 +84,22 @@ export default function RaporPage() {
     <div className="page rapor-page">
       <header className="page-header">
         <h1>Günlük Kasa</h1>
-        <a className="rapor-nav-link" href={`/?date=${date}`}>
-          ← Gün Görünümü
-        </a>
-        <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
-          Ay Görünümü
-        </a>
-        <button
-          type="button"
-          className="btn-primary btn-small"
-          onClick={() => window.open(`/api/reports/daily/pdf?date=${date}`)}
-        >
-          PDF İndir
-        </button>
-        <LogoutButton />
+        <nav className="page-nav">
+          <a className="rapor-nav-link" href={`/?date=${date}`}>
+            ← Gün Görünümü
+          </a>
+          <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
+            Ay Görünümü
+          </a>
+          <button
+            type="button"
+            className="btn-primary btn-small"
+            onClick={() => window.open(`/api/reports/daily/pdf?date=${date}`)}
+          >
+            PDF İndir
+          </button>
+          <LogoutButton />
+        </nav>
       </header>
 
       {loadError && <div className="banner banner-error">{loadError}</div>}

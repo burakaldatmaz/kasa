@@ -114,7 +114,11 @@ export default function TxnList({ transactions, onChanged }: Props) {
       <li key={t.id} className="txn-row">
         <div className="txn-main">
           <span className="txn-text">
-            {t.categoryName} ({paymentLabel(t.paymentMethod)}) — {formatSatang(t.amountSatang)}
+            <span className="txn-cat">
+              {t.categoryName} ({paymentLabel(t.paymentMethod)})
+            </span>
+            <span className="txn-dash"> — </span>
+            <span className="txn-amount">{formatSatang(t.amountSatang)}</span>
           </span>
           <span className="txn-actions">
             <button type="button" className="btn-link" onClick={() => startEdit(t)}>

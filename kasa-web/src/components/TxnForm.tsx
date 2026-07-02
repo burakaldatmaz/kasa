@@ -58,7 +58,8 @@ export default function TxnForm({ title, type, date, categories, onSaved, onCate
       })
       setAmount('')
       setNote('')
-      amountRef.current?.focus()
+      // preventScroll: iOS Safari'de odak dönerken sayfa zıplamasın, klavye açık kalsın.
+      amountRef.current?.focus({ preventScroll: true })
       onSaved()
     } catch (err) {
       setError(errorMessage(err))

@@ -1,0 +1,31 @@
+PASS  a0: gün sayfasında yatay taşma yok  [scrollWidth=390]
+PASS  a1: Gün Net tutarı viewport içinde  [{"x":14,"y":801.921875,"width":166.5,"height":28.078125}]
+PASS  a2: ANA KASA tutarı viewport içinde  [{"x":209.5,"y":801.921875,"width":166.5,"height":28.078125}]
+PASS  a3: iki tutar üst üste binmiyor
+PASS  a4: bar etiketleri Gün Net + ANA KASA
+PASS  b1: detay paneli varsayılan kapalı
+PASS  b2: bara dokununca detay açılır
+PASS  b3: detayda 4 hücre (Devir/Gelir/Gider/POS)
+PASS  b4: detay tutarları taşmıyor/binmiyor
+PASS  b5: tekrar dokununca kapanır
+PASS  c1: kategori dropdown tam genişlik  [328/328]
+PASS  c2: ödeme dropdown tam genişlik  [328/328]
+PASS  c3: + Yeni Kategori tam genişlik, kategori satırının altında
+PASS  c4: Ekle butonu tam genişlik ve ≥44px
+PASS  c5: Düzenle/Sil dokunma alanı ≥44x44  [{"x":253.953125,"y":1233.5,"width":49.046875,"height":44}]
+PASS  d1: Ekle sonrası odak tutar alanında
+PASS  d2: tutar alanı sıfırlandı
+PASS  r1: rapor sayfasında yatay taşma yok  [scrollWidth=390]
+PASS  e0: ay sayfasında gövde yatay taşmıyor  [scrollWidth=390]
+PASS  e1: ay tablosu konteyner içinde yatay kaydırılabilir
+PASS  e2: kaydırınca Tarih kolonu sabit  [17→17]
+PASS  e3: diğer kolonlar gerçekten kaydı  [118.15625→-131.84375]
+PASS  f1: desktop özet barında 6 hücre görünür
+PASS  f2: mobil özet katmanı desktop’ta gizli
+PASS  f3: 6 hücre tek sırada yan yana
+PASS  f4: Gelir/Gider formları yan yana (iki sütun)
+PASS  f5: nav linkleri başlıkla aynı satırda
+PASS  f6: form alanları desktop’ta yatay dizilimde
+PASS  f7: desktop’ta ay tablosu kaydırmasız sığıyor
+
+SONUÇ: 29 PASS, 0 FAIL

@@ -102,20 +102,22 @@ export default function DayPage() {
           </button>
         </div>
         <span className="date-long">{formatDateLong(date)}</span>
-        <a className="rapor-nav-link" href={`/rapor?date=${date}`}>
-          Rapor Görünümü
-        </a>
-        <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
-          Ay Görünümü
-        </a>
-        <button
-          type="button"
-          className="btn-primary btn-small"
-          onClick={() => window.open(`/api/reports/daily/pdf?date=${date}`)}
-        >
-          PDF
-        </button>
-        <LogoutButton />
+        <nav className="page-nav">
+          <a className="rapor-nav-link" href={`/rapor?date=${date}`}>
+            Rapor Görünümü
+          </a>
+          <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
+            Ay Görünümü
+          </a>
+          <button
+            type="button"
+            className="btn-primary btn-small"
+            onClick={() => window.open(`/api/reports/daily/pdf?date=${date}`)}
+          >
+            PDF
+          </button>
+          <LogoutButton />
+        </nav>
       </header>
 
       {report?.fleetMissing && <div className="banner banner-warn">⚠ Bugünün filo verisi girilmedi</div>}

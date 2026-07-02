@@ -107,17 +107,19 @@ export default function AyPage() {
             ▶
           </button>
         </div>
-        <a className="rapor-nav-link" href="/">
-          ← Gün Görünümü
-        </a>
-        <button
-          type="button"
-          className="btn-primary btn-small"
-          onClick={() => window.open(`/api/reports/month/xlsx?month=${month}`)}
-        >
-          Excel İndir
-        </button>
-        <LogoutButton />
+        <nav className="page-nav">
+          <a className="rapor-nav-link" href="/">
+            ← Gün Görünümü
+          </a>
+          <button
+            type="button"
+            className="btn-primary btn-small"
+            onClick={() => window.open(`/api/reports/month/xlsx?month=${month}`)}
+          >
+            Excel İndir
+          </button>
+          <LogoutButton />
+        </nav>
       </header>
 
       {loadError && <div className="banner banner-error">{loadError}</div>}
@@ -125,66 +127,68 @@ export default function AyPage() {
       {report && fleet && (
         <>
           <div className="card">
-            <table className="ay-table">
-              <thead>
-                <tr>
-                  <th>Tarih</th>
-                  <th className="ay-amount">Gelir</th>
-                  <th className="ay-amount">Gider</th>
-                  <th className="ay-amount">POS</th>
-                  <th className="ay-amount">Gün Net</th>
-                  <th className="ay-amount">Kümülatif Kasa</th>
-                  <th className="ay-amount">Kiralama %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {report.days.length === 0 && (
+            <div className="table-scroll">
+              <table className="ay-table">
+                <thead>
                   <tr>
-                    <td className="ay-empty" colSpan={7}>
-                      — Bu ayda işlem yok —
-                    </td>
+                    <th>Tarih</th>
+                    <th className="ay-amount">Gelir</th>
+                    <th className="ay-amount">Gider</th>
+                    <th className="ay-amount">POS</th>
+                    <th className="ay-amount">Gün Net</th>
+                    <th className="ay-amount">Kümülatif Kasa</th>
+                    <th className="ay-amount">Kiralama %</th>
                   </tr>
-                )}
-                {report.days.map(d => (
-                  <tr
-                    key={d.date}
-                    className="ay-row-click"
-                    title="Günün raporunu aç"
-                    onClick={() => {
-                      window.location.href = `/rapor?date=${d.date}`
-                    }}
-                  >
-                    <td>{formatDateShort(d.date)}</td>
-                    <td className="ay-amount">{formatSatang(d.incomeTotal)}</td>
-                    <td className="ay-amount">{formatSatang(d.expenseTotal)}</td>
-                    <td className="ay-amount">{formatSatang(d.posFee)}</td>
-                    <td className={`ay-amount ${d.dayNet < 0 ? 'ay-negative' : ''}`}>
-                      {formatSatang(d.dayNet)}
+                </thead>
+                <tbody>
+                  {report.days.length === 0 && (
+                    <tr>
+                      <td className="ay-empty" colSpan={7}>
+                        — Bu ayda işlem yok —
+                      </td>
+                    </tr>
+                  )}
+                  {report.days.map(d => (
+                    <tr
+                      key={d.date}
+                      className="ay-row-click"
+                      title="Günün raporunu aç"
+                      onClick={() => {
+                        window.location.href = `/rapor?date=${d.date}`
+                      }}
+                    >
+                      <td>{formatDateShort(d.date)}</td>
+                      <td className="ay-amount">{formatSatang(d.incomeTotal)}</td>
+                      <td className="ay-amount">{formatSatang(d.expenseTotal)}</td>
+                      <td className="ay-amount">{formatSatang(d.posFee)}</td>
+                      <td className={`ay-amount ${d.dayNet < 0 ? 'ay-negative' : ''}`}>
+                        {formatSatang(d.dayNet)}
+                      </td>
+                      <td className={`ay-amount ${d.cumulativeBalance < 0 ? 'ay-negative' : ''}`}>
+                        {formatSatang(d.cumulativeBalance)}
+                      </td>
+                      <td className="ay-amount">{rentalText(rentalByDate.get(d.date))}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  {/* Toplamlar API'nin totals/finalBalance alanlarından; UI toplamaz (I1). */}
+                  <tr>
+                    <td>TOPLAM</td>
+                    <td className="ay-amount">{formatSatang(report.totals.incomeTotal)}</td>
+                    <td className="ay-amount">{formatSatang(report.totals.expenseTotal)}</td>
+                    <td className="ay-amount">{formatSatang(report.totals.posFee)}</td>
+                    <td className={`ay-amount ${report.totals.dayNet < 0 ? 'ay-negative' : ''}`}>
+                      {formatSatang(report.totals.dayNet)}
                     </td>
-                    <td className={`ay-amount ${d.cumulativeBalance < 0 ? 'ay-negative' : ''}`}>
-                      {formatSatang(d.cumulativeBalance)}
+                    <td className={`ay-amount ${negativeFinal ? 'ay-negative' : ''}`}>
+                      {formatSatang(report.finalBalance)}
                     </td>
-                    <td className="ay-amount">{rentalText(rentalByDate.get(d.date))}</td>
+                    <td />
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                {/* Toplamlar API'nin totals/finalBalance alanlarından; UI toplamaz (I1). */}
-                <tr>
-                  <td>TOPLAM</td>
-                  <td className="ay-amount">{formatSatang(report.totals.incomeTotal)}</td>
-                  <td className="ay-amount">{formatSatang(report.totals.expenseTotal)}</td>
-                  <td className="ay-amount">{formatSatang(report.totals.posFee)}</td>
-                  <td className={`ay-amount ${report.totals.dayNet < 0 ? 'ay-negative' : ''}`}>
-                    {formatSatang(report.totals.dayNet)}
-                  </td>
-                  <td className={`ay-amount ${negativeFinal ? 'ay-negative' : ''}`}>
-                    {formatSatang(report.finalBalance)}
-                  </td>
-                  <td />
-                </tr>
-              </tfoot>
-            </table>
+                </tfoot>
+              </table>
+            </div>
           </div>
 
           <div className="ay-dist-grid">

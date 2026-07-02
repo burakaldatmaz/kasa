@@ -69,15 +69,36 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
         <div className="field-row">
           <label className="field">
             <span>Filo Toplamı</span>
-            <input type="number" min={0} step={1} value={total} onChange={e => setTotal(e.target.value)} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              value={total}
+              onChange={e => setTotal(e.target.value)}
+            />
           </label>
           <label className="field">
             <span>Arızalı</span>
-            <input type="number" min={0} step={1} value={broken} onChange={e => setBroken(e.target.value)} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              value={broken}
+              onChange={e => setBroken(e.target.value)}
+            />
           </label>
           <label className="field">
             <span>Kirada</span>
-            <input type="number" min={0} step={1} value={rented} onChange={e => setRented(e.target.value)} />
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              value={rented}
+              onChange={e => setRented(e.target.value)}
+            />
           </label>
           <button type="submit" className="btn-primary btn-submit" disabled={saving}>
             Kaydet

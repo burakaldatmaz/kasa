@@ -50,6 +50,11 @@ body {
   color: var(--header);
 }
 
+/* Desktop: sarmalayıcı kutu üretmez; linkler başlığın doğrudan flex öğesi kalır. */
+.page-nav {
+  display: contents;
+}
+
 .date-nav {
   display: flex;
   align-items: center;
@@ -461,6 +466,15 @@ body {
   background: var(--danger);
 }
 
+/* Desktop: hücre sarmalayıcısı kutu üretmez; 6 hücre barın doğrudan flex öğesi kalır. */
+.summary-cells {
+  display: contents;
+}
+
+.summary-mobile {
+  display: none;
+}
+
 /* ---------- Rapor sayfası (PDF ile birebir aynı düzen) ---------- */
 
 .rapor-page {
@@ -615,6 +629,11 @@ body {
   text-align: center;
   font-weight: 600;
   color: var(--header);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ay-table {
@@ -796,4 +815,236 @@ body {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 14px;
+}
+
+/* ---------- Mobil — tek kırılım (≤640px); 641px+ desktop düzeni değişmez ---------- */
+
+@media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  /* Nav linkleri: sığmazsa yatay kaydırılabilir şerit (hamburger yok). */
+  .page-nav {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1 0 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .page-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .page-nav > * {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .page-nav .rapor-nav-link {
+    padding: 12px 0; /* iOS dokunma alanı */
+  }
+
+  .page-nav .btn-small {
+    min-height: 40px;
+  }
+
+  /* 16px altı font iOS Safari'de odakta otomatik zoom tetikler. */
+  .field input,
+  .field select,
+  .txn-edit-form input,
+  .txn-edit-form select,
+  .date-nav input[type='date'] {
+    font-size: 16px;
+  }
+
+  /* Formlar: alanlar tek sütun dikey akış, kontroller tam genişlik. */
+  .field-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .field-inline {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-new-category {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .btn-submit {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  /* Filo: üç sayı girişi tek sütun (genişlik .field input kuralından). */
+  .fleet-card .field input {
+    width: 100%;
+  }
+
+  /* İşlem listesi: satır iki katlı — üstte kategori (yöntem), altta tutar sağa dayalı. */
+  .txn-main {
+    align-items: center;
+  }
+
+  .txn-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .txn-dash {
+    display: none;
+  }
+
+  .txn-amount {
+    align-self: flex-end;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .txn-actions {
+    gap: 4px;
+  }
+
+  .txn-actions .btn-link {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Inline düzenleme: alanlar dikey açılır. */
+  .txn-edit-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .txn-edit-form input,
+  .txn-edit-form select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .txn-edit-form .btn-small {
+    min-height: 44px;
+  }
+
+  /* Özet barı: 6 hücre yerine iki katman — Gün Net + Ana Kasa her zaman görünür,
+     Devir/Gelir/Gider/POS dokununca açılan detay panelinde. */
+  .summary-bar {
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .summary-cells {
+    display: none;
+  }
+
+  .summary-mobile {
+    display: block;
+    width: 100%;
+  }
+
+  .summary-primary {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .summary-primary .summary-cell {
+    padding: 12px 14px 14px;
+  }
+
+  /* Günün iki hayati sayısı büyük punto; hiçbir genişlikte kırpılmaz:
+     tabular-nums + nowrap + vw ile gerektiğinde kademeli küçülen punto. */
+  .summary-mobile .summary-value {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .summary-primary .summary-value {
+    font-size: clamp(15px, 4.8vw, 19px);
+  }
+
+  /* Aç/kapa durumu Gün Net etiketinde ok ile gösterilir. */
+  .summary-primary .summary-cell:first-child .summary-label::after {
+    content: ' ▲';
+    color: var(--muted);
+  }
+
+  .summary-primary[aria-expanded='true'] .summary-cell:first-child .summary-label::after {
+    content: ' ▼';
+  }
+
+  .summary-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-detail[hidden] {
+    display: none;
+  }
+
+  .summary-detail .summary-cell {
+    padding: 8px 14px;
+  }
+
+  .summary-detail .summary-cell:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-detail .summary-cell:nth-child(even) {
+    border-right: none;
+  }
+
+  /* Ay tablosu: kolon gizlenmez; yatay kaydırma + Tarih kolonu sticky-left. */
+  .ay-table th:first-child,
+  .ay-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    white-space: nowrap;
+    background: #fff;
+  }
+
+  .ay-table td:first-child {
+    box-shadow: inset -1px 0 0 var(--border);
+  }
+
+  .ay-table th:first-child {
+    background: var(--header);
+    z-index: 2;
+  }
+
+  .ay-table tbody tr:nth-child(even) td:first-child {
+    background: var(--row-alt);
+  }
+
+  /* Rapor sayfası: sayfa dolgusu daralır (dağılım blokları 700px altında zaten tek sütun). */
+  .rapor-sheet {
+    padding: 14px;
+  }
 }

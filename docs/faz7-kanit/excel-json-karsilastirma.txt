@@ -1,0 +1,37 @@
+KARŞILAŞTIRMA — kasa-2026-07.xlsx Sheet1 'Ay Özeti'  ⇄  GET /api/reports/month?month=2026-07
+
+Gün satırları:
+  2026-07-01  Gelir                          Excel:     4,450.00 ฿   JSON:     4,450.00 ฿   EŞLEŞTİ
+  2026-07-01  Gider                          Excel:       460.00 ฿   JSON:       460.00 ฿   EŞLEŞTİ
+  2026-07-01  POS                            Excel:        98.00 ฿   JSON:        98.00 ฿   EŞLEŞTİ
+  2026-07-01  Gün Net                        Excel:     3,892.00 ฿   JSON:     3,892.00 ฿   EŞLEŞTİ
+  2026-07-01  Kümülatif                      Excel:     3,892.00 ฿   JSON:     3,892.00 ฿   EŞLEŞTİ
+  2026-07-02  Gelir                          Excel:     1,600.00 ฿   JSON:     1,600.00 ฿   EŞLEŞTİ
+  2026-07-02  Gider                          Excel:       350.00 ฿   JSON:       350.00 ฿   EŞLEŞTİ
+  2026-07-02  POS                            Excel:         0.00 ฿   JSON:         0.00 ฿   EŞLEŞTİ
+  2026-07-02  Gün Net                        Excel:     1,250.00 ฿   JSON:     1,250.00 ฿   EŞLEŞTİ
+  2026-07-02  Kümülatif                      Excel:     5,142.00 ฿   JSON:     5,142.00 ฿   EŞLEŞTİ
+
+TOPLAM satırı:
+  TOPLAM Gelir                               Excel:     6,050.00 ฿   JSON:     6,050.00 ฿   EŞLEŞTİ
+  TOPLAM Gider                               Excel:       810.00 ฿   JSON:       810.00 ฿   EŞLEŞTİ
+  TOPLAM POS                                 Excel:        98.00 ฿   JSON:        98.00 ฿   EŞLEŞTİ
+  TOPLAM Gün Net                             Excel:     5,142.00 ฿   JSON:     5,142.00 ฿   EŞLEŞTİ
+  TOPLAM Kümülatif (finalBalance)            Excel:     5,142.00 ฿   JSON:     5,142.00 ฿   EŞLEŞTİ
+
+Ortaklık dağıtımı bloğu:
+  Ay Sonu Ana Kasa                           Excel:     5,142.00 ฿   JSON:     5,142.00 ฿   EŞLEŞTİ
+  Amornrat Thanmaen (%90)                    Excel:     4,627.80 ฿   JSON:     4,627.80 ฿   EŞLEŞTİ
+  Thanchanok Sabancıoğlu (%10)               Excel:       514.20 ฿   JSON:       514.20 ฿   EŞLEŞTİ
+  partner1 + partner2 == finalBalance        Excel:     5,142.00 ฿   JSON:     5,142.00 ฿   EŞLEŞTİ
+
+Sheet2 'İşlemler' veri satırı: 8   API işlem sayısı: 8   EŞLEŞTİ
+Sheet3 kategori toplamları:
+  Gelir / Kiralama                           Excel:     5,200.00 ฿   JSON:     5,200.00 ฿   EŞLEŞTİ
+  Gelir / Eksik Yakıt Tahsilatı              Excel:       150.00 ฿   JSON:       150.00 ฿   EŞLEŞTİ
+  Gelir / Kiralama Uzatma                    Excel:       700.00 ฿   JSON:       700.00 ฿   EŞLEŞTİ
+  Gider / Yakıt Alım                         Excel:       400.00 ฿   JSON:       400.00 ฿   EŞLEŞTİ
+  Gider / Su Alım                            Excel:        60.00 ฿   JSON:        60.00 ฿   EŞLEŞTİ
+  Gider / Servis Bakım                       Excel:       350.00 ฿   JSON:       350.00 ฿   EŞLEŞTİ
+
+SONUÇ: TÜM DEĞERLER BİREBİR EŞLEŞTİ ✓

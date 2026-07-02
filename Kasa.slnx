@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Kasa.Api/Kasa.Api.csproj" />
+  <Project Path="Kasa.Domain/Kasa.Domain.csproj" />
+  <Project Path="Kasa.Tests/Kasa.Tests.csproj" />
+</Solution>

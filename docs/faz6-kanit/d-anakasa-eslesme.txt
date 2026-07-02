@@ -1,0 +1,63 @@
+FAZ 6 KANIT — ANA KASA eşleşmesi ve Türkçe karakter kontrolü (2026-08-03)
+==========================================================================
+
+[1] API JSON  GET /api/reports/daily?date=2026-08-03
+    closingBalance (satang) : 17750
+    -> baht karşılığı       : ฿177.50
+    dayNet=17750  posFee=12250  posFeeRatePercent=3.5
+    incomeTotal=610000  expenseTotal=580000
+
+[2] PDF  GET /api/reports/daily/pdf?date=2026-08-03 (kasa-islem-2026-08-03.pdf)
+    sayfa sayısı            : 1
+    ANA KASA satırı         : 'ANA KASA ฿177.50'
+
+[3] EŞLEŞME: API closingBalance 17750 satang == PDF 'ANA KASA ฿177.50'  ->  BİREBİR EŞLEŞTİ ✓
+
+[4] Türkçe karakter kontrolü (PDF'ten çıkarılan metin):
+    ✓ İ, Ş (başlık)              'KASA İŞLEM — 3 Ağustos 2026'
+    ✓ ğ (ay adı)                 'Ağustos'
+    ✓ ı, İ (kategori)            'Eksik Yakıt Tahsilatı'
+    ✓ ş (kategori)               'Maaş'
+    ✓ ğ (not)                    'Fren balata + yağ'
+    ✓ ü (not)                    'Honda Click 3 gün'
+    ✓ ü, ı (not)                 'Dükkan kirası taksit'
+    ✓ ı + ⚠ (filo)               'Arızalı 4 ⚠'
+    ✓ ฿ (para birimi)            '฿177.50'
+    ✓ POS oranı Settings'ten     'POS Kesintisi (%3,5)'
+
+[5] PDF'ten çıkarılan tam metin:
+--------------------------------------------------------------------------
+KASA İŞLEM — 3 Ağustos 2026
+Devir (önceki günden): ฿0.00
+GELİR
+Kiralama (Nakit) ฿1,000.00
+Honda Click 3 gün
+Kiralama (Nakit) ฿800.00
+Kiralama (Kredi Kartı) ฿3,500.00
+Haftalık kiralama
+Eksik Yakıt Tahsilatı (Nakit) ฿200.00
+Kiralama Uzatma (Banka Transferi) ฿600.00
+GİDER
+Kira (Banka Transferi) ฿1,000.00
+Dükkan kirası taksit
+Yakıt Alım (Nakit) ฿500.00
+Servis Bakım (Banka Transferi) ฿2,300.00
+Fren balata + yağ
+Maaş (Nakit) ฿2,000.00
+GELİR TÜRÜ DAĞILIMI
+Kiralama ฿5,300.00
+Eksik Yakıt Tahsilatı ฿200.00
+Kiralama Uzatma ฿600.00
+GİDER TÜRÜ DAĞILIMI
+Kira ฿1,000.00
+Yakıt Alım ฿500.00
+Servis Bakım ฿2,300.00
+Maaş ฿2,000.00
+GÜN NET
+Gelirler Toplamı ฿6,100.00
+Giderler Toplamı ฿5,800.00
+POS Kesintisi (%3,5) ฿122.50
+Gün Net ฿177.50
++ Devir ฿0.00
+ANA KASA ฿177.50
+FİLO: Toplam 14  |  Arızalı 4 ⚠  |  Kirada 8  |  Kiralama %80.0

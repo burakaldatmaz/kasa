@@ -3,6 +3,7 @@ import type { CategoryTotal, FleetMonth, MonthReport } from './api'
 import { errorMessage, getFleetMonth, getMonthReport } from './api'
 import { currentMonthISO, formatDateShort, formatMonthLong, shiftMonth } from './dates'
 import { formatSatang } from './format'
+import LogoutButton from './components/LogoutButton'
 
 const MONTH_RE = /^\d{4}-\d{2}$/
 
@@ -116,6 +117,7 @@ export default function AyPage() {
         >
           Excel İndir
         </button>
+        <LogoutButton />
       </header>
 
       {loadError && <div className="banner banner-error">{loadError}</div>}

@@ -153,6 +153,14 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     throw new ApiError('Sunucuya ulaşılamadı. API çalışıyor mu?', 0)
   }
 
+  // Oturum yok/düşmüş: tek noktadan login'e yönlendir (sayfa sayfa 401 kontrolü yok).
+  // Auth uçları hariç: login'in kendi 401'i "parola hatalı" mesajıdır.
+  if (response.status === 401 && !url.startsWith('/api/auth/') && window.location.pathname !== '/login') {
+    const next = window.location.pathname + window.location.search
+    window.location.assign(`/login?next=${encodeURIComponent(next)}`)
+    throw new ApiError('Oturum açmanız gerekiyor.', 401)
+  }
+
   if (!response.ok) {
     let message = `İstek başarısız oldu (HTTP ${response.status}).`
     try {
@@ -178,6 +186,14 @@ function jsonInit(method: string, body: unknown): RequestInit {
 
 export function errorMessage(err: unknown): string {
   return err instanceof Error ? err.message : 'Beklenmeyen bir hata oluştu.'
+}
+
+export function login(password: string): Promise<void> {
+  return request('/api/auth/login', jsonInit('POST', { password }))
+}
+
+export function logout(): Promise<void> {
+  return request('/api/auth/logout', { method: 'POST' })
 }
 
 export function getCategories(type: TransactionType): Promise<Category[]> {

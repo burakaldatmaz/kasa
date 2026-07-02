@@ -4,6 +4,7 @@ import { errorMessage, getDailyReport } from './api'
 import { formatDateReport, todayISO } from './dates'
 import { formatSatang } from './format'
 import { paymentLabel } from './labels'
+import LogoutButton from './components/LogoutButton'
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -96,6 +97,7 @@ export default function RaporPage() {
         >
           PDF İndir
         </button>
+        <LogoutButton />
       </header>
 
       {loadError && <div className="banner banner-error">{loadError}</div>}

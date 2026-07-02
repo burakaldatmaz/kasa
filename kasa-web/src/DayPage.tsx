@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { Category, DailyReport, Transaction } from './api'
 import { errorMessage, getCategories, getDailyReport, getTransactions } from './api'
 import { formatDateLong, shiftDate, todayISO } from './dates'
+import LogoutButton from './components/LogoutButton'
 import TxnForm from './components/TxnForm'
 import TxnList from './components/TxnList'
 import SummaryBar from './components/SummaryBar'
@@ -107,6 +108,7 @@ export default function DayPage() {
         <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
           Ay Görünümü
         </a>
+        <LogoutButton />
       </header>
 
       {report?.fleetMissing && <div className="banner banner-warn">⚠ Bugünün filo verisi girilmedi</div>}

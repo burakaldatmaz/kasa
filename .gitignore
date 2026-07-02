@@ -16,3 +16,7 @@ kasa-web/dist/
 .DS_Store
 .vs/
 .idea/
+
+# Production yerel durumu
+backups/
+.env

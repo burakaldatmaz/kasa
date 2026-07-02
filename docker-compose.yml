@@ -1,0 +1,56 @@
+# Kasa — production compose (kasa.bkkbike.com)
+# Kurulum:
+#   1. PASSWORD_HASH üret:  docker compose run --rm api hash-password '<parola>'
+#   2. Hash'i .env dosyasına yaz (bkz. .env.example) — compose .env'i otomatik okur.
+#   3. docker compose up -d --build
+services:
+  api:
+    build: .
+    image: kasa-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080" # dışarıya yalnız nginx açar (deploy/nginx-kasa.bkkbike.com.conf)
+    environment:
+      # TZ ÖNEMLİ: "bugün" hesapları (missingDays, varsayılan tarih) Bangkok gününe göre.
+      # Container UTC kalırsa gece 00:00-07:00 arası işlemler yanlış güne yazar.
+      TZ: Asia/Bangkok
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true" # nginx'ten X-Forwarded-For/Proto işlenir
+      ConnectionStrings__Kasa: "Data Source=/data/kasa.db"
+      AUTO_MIGRATE: "true" # boş /data volume'ünde şema + seed migration'larla kurulur
+      # Boş bırakılırsa api Production'da açılışta net hata verir (hash-password komutu
+      # .env olmadan da çalışabilsin diye burada zorunlu kılınmadı).
+      PASSWORD_HASH: "${PASSWORD_HASH:-}"
+    volumes:
+      - kasa-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /health HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && head -1 <&3 | grep -q ' 200 '",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Gece yedeği: her gün 03:00 (Bangkok) sqlite3 ".backup" ile tutarlı kopya alır
+  # (cp DEĞİL — yazma anındaki kopya bozuk olabilir), 30 günden eskiler silinir.
+  backup:
+    image: alpine:3.22
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Bangkok
+    volumes:
+      - kasa-data:/data
+      - ./backups:/backups
+      - ./deploy/backup.sh:/usr/local/bin/kasa-backup:ro
+    command: >
+      sh -c "apk add --no-cache sqlite tzdata &&
+             echo '0 3 * * * /usr/local/bin/kasa-backup' > /etc/crontabs/root &&
+             crond -f -l 8"
+
+volumes:
+  kasa-data:

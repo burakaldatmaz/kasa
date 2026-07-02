@@ -1,0 +1,16 @@
+# build çıktıları ve yerel durum imaja girmez
+.git
+**/bin
+**/obj
+**/node_modules
+kasa-web/dist
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.user
+docs
+backups
+.env
+.DS_Store
+Dockerfile
+docker-compose.yml

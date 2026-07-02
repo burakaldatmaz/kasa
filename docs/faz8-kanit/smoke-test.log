@@ -1,0 +1,88 @@
+
+== 0a: eski smoke ortamını temizle (taze volume)
+
+== 0b: parola hash'i üret (docker compose run api hash-password)
+ Network kasa-smoke_default Creating 
+ Network kasa-smoke_default Created 
+ Volume kasa-smoke_kasa-data Creating 
+ Volume kasa-smoke_kasa-data Created 
+ Container kasa-smoke-api-run-3d90b5f03526 Creating 
+ Container kasa-smoke-api-run-3d90b5f03526 Created 
+   hash: $2a$12$D0MyPsQcLtyWt...
+
+== 0c: sıfır ortamda ayağa kaldır
+ Container kasa-smoke-api-1 Waiting 
+ Container kasa-smoke-backup-1 Healthy 
+ Container kasa-smoke-api-1 Healthy 
+
+== 1: /health auth'suz 200
+   OK  [health] 200
+{"status":"ok"}
+
+== 2: auth'suz /api/transactions -> 401
+   OK  [txn-401] 401
+
+== 3: yanlış parola -> 401
+   OK  [login-yanlis] 401
+
+== 4: doğru parola -> 204 + cookie
+   OK  [login] 204
+   cookie kaydedildi
+
+== 5: seed kategoriler görünür
+   OK  [seed] Kiralama mevcut
+
+== 6: işlem gir (Kiralama, 2300 baht, nakit)
+   OK  [txn-post] 201
+{"id":1,"date":"2026-07-02","type":"Income","categoryId":1,"categoryName":"Kiralama","paymentMethod":"Cash","amountSatang":230000,"note":"smoke","createdAt":"2026-07-02T13:18:09.0947469Z"}
+
+== 7: /rapor PDF indir
+   OK  [pdf] 200
+   OK  [pdf] %PDF imzası, boyut:    25649 bayt
+
+== 8: /ay Excel indir
+   OK  [xlsx] 200
+   OK  [xlsx] zip açılıyor, boyut:     9212 bayt
+
+== 9: filo gir
+   OK  [fleet] 200
+{"date":"2026-07-02","totalBikes":30,"brokenBikes":2,"rentedBikes":20,"rentalPercent":71.4,"idleBikes":8,"brokenAlert":true}
+
+== 10: SPA fallback — /rapor ve /ay yenilemede index.html
+   OK  [spa] / -> index.html
+   OK  [spa] /rapor -> index.html
+   OK  [spa] /ay -> index.html
+   OK  [spa] /login -> index.html
+   OK  [api-fallback-401] 401
+
+== 11: logout -> 204, eski cookie -> 401
+   OK  [logout] 204
+   OK  [eski-cookie-401] 401
+
+== 12: TZ kontrolü (container saati + uygulama saati)
+Thu Jul  2 20:18:09 +07 2026
+Thu Jul  2 13:18:10 UTC 2026
+   -- gece yarısı senaryosu: UTC 18:00 -> BKK ertesi gün 01:00 --
+2026-07-03 01:00 +0700
+   -- uygulamanın gördüğü saat (dotnet Kasa.Api.dll now) --
+utc   = 2026-07-02T13:18:10.2399230+00:00
+local = 2026-07-02T20:18:10.2437126+07:00
+zone  = Asia/Bangkok
+today = 2026-07-02
+
+== 13: yedek servisi — elle tetikle, dosyayı sqlite3 ile aç
+0 3 * * * /usr/local/bin/kasa-backup
+2026-07-02 20:18:10 yedek alındı: /backups/kasa-2026-07-02.db
+drwxr-xr-x   3 burakaldatmaz  staff     96 Jul  2 20:18 .
+drwxr-xr-x  16 burakaldatmaz  staff    512 Jul  2 20:17 ..
+-rw-r--r--@  1 burakaldatmaz  staff  57344 Jul  2 20:18 kasa-2026-07-02.db
+ok
+14 kategori
+1 islem
+
+== 14: imaj boyutu
+kasa-api 630MB
+
+====================
+SMOKE TEST: TÜM ADIMLAR BAŞARILI
+====================

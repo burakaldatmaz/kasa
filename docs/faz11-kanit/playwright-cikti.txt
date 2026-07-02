@@ -1,0 +1,61 @@
+— Mobil 390x844 —
+  (bugün: 2026-07-02)
+— (a) Filo rezervasyon kartı (bugün, null durumda) —
+  ✓ (a) "Bugünün Rezervasyonları" bölüm başlığı
+  ✓ (a) toplam 5 stepper satırı (3 filo + 2 rezervasyon)
+  ✓ (a) Başlayan null → giriş BOŞ (0 değil)
+  ✓ (a) Başlayan boş göstergesi "—" (placeholder)
+  ✓ (a) Biten null → giriş BOŞ + "—"
+  ✓ (f) Filo (boş sayaç): yatay sayfa taşması yok (scrollWidth=390)
+— (a) rezervasyon giriş/kaydet akışı —
+  ✓ (a) Başlayan: doğrudan yazma 6 + stepper → 7
+  ✓ (a) kaydet → toast
+  ✓ (a) API: startedReservations=7
+  ✓ (a) API: endedReservations=5
+  ✓ (j) K1: rentalPercent sayaçlardan ETKİLENMEDİ (33/59 → %55.9)
+— (b) 2026-07-01: dokunmadan kaydet → null —
+  ✓ (b) 07-01 sayaç girişleri boş (null)
+  ✓ (b) sayaçlara dokunulmadan kaydedildi → API null (0 DEĞİL)
+— (c) gün mini kart meta —
+  ✓ (c) bugün meta: "… · 7 başladı / 5 bitti"
+  ✓ (f) Gün: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (c) null günde meta kısmı TAMAMEN gizli
+— (d) ay Günler listesi trend göstergesi —
+  ✓ (d) 2 Temmuz: trend satırı görünür
+  ✓ (d) trend "↑7 ↓5"
+  ✓ (d) ↑ yeşil / ↓ kırmızı
+  ✓ (d) 1 Temmuz (null): trend TAMAMEN gizli (— bile yok)
+  ✓ (d) 1 Temmuz satırı sade (↑/↓ içermiyor)
+  ✓ (d) filo özeti: "Başlayan 7 · Biten 5"
+  ✓ (f) Ay: yatay sayfa taşması yok (scrollWidth=390)
+— (e) mobil rapor filo bölümü —
+  ✓ (e) rapor filo: Başlayan 7 · Biten 5
+  ✓ (f) Rapor: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) null günde rapor filo: "Başlayan — · Biten —"
+  ✓ (j) /api/fleet/month: totalStarted=7 (null gün katılmadı)
+  ✓ (j) /api/fleet/month: totalEnded=5
+  ✓ (j) /api/reports/daily fleet: started/ended alanları
+— Desktop 1280x800 —
+— (g) FleetCard —
+  ✓ (g) Başlayan alanı kayıtlı değerle dolu (7)
+  ✓ (g) Biten alanı kayıtlı değerle dolu (5)
+  ✓ (g) rozet "Başlayan 7 · Biten 5"
+  ✓ (g) null günde alanlar boş + "—" placeholder
+  ✓ (g) null günde rezervasyon rozeti gizli
+  ✓ (g) desktop kaydet → rozet "Başlayan 3 · Biten 1"
+  ✓ (g) API round-trip 3/1
+  ✓ (g) eski gövdeyle PUT → sayaçlar tekrar null
+— (h) /ay sütunları —
+  ✓ (h) başlıklar: … Kiralama % | Başlayan | Biten
+  ✓ (h) 02.07 satırı: Başlayan 7, Biten 5
+  ✓ (h) 01.07 satırı (null): "—" / "—"
+  ✓ (h) filo özeti: Toplam Başlayan 7 | Toplam Biten 5
+— (i) /rapor filo satırı —
+  ✓ (i) FİLO satırı: "| Başlayan 7 | Biten 5"
+  ✓ (i) null günde: "Başlayan — | Biten —"
+— PDF/Excel kanıt dosyaları —
+  ✓ PDF (değerli sayaçlar) üretildi
+  ✓ PDF (null sayaçlar) üretildi
+  ✓ Excel (2026-07) üretildi
+
+SONUÇ: 46 PASS / 0 FAIL

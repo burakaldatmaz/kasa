@@ -90,9 +90,12 @@ export default function AyPage() {
     }
   }, [month])
 
-  // Kiralama % gün tablosuna tarihe göre eşlenir; snapshot yoksa "—" (UI hesap yapmaz).
-  const rentalByDate = new Map(fleet?.days.map(d => [d.date, d.rentalPercent]) ?? [])
+  // Filo günü tabloya tarihe göre eşlenir; snapshot yoksa "—" (UI hesap yapmaz).
+  const fleetByDate = new Map(fleet?.days.map(d => [d.date, d]) ?? [])
   const negativeFinal = report !== null && report.finalBalance < 0
+
+  /** Rezervasyon sayacı metni: null = "girilmedi" → "—" (K2). */
+  const countText = (n: number | null | undefined) => (n != null ? String(n) : '—')
 
   return (
     <div className="page ay-page">
@@ -138,12 +141,14 @@ export default function AyPage() {
                     <th className="ay-amount">Gün Net</th>
                     <th className="ay-amount">Kümülatif Kasa</th>
                     <th className="ay-amount">Kiralama %</th>
+                    <th className="ay-amount">Başlayan</th>
+                    <th className="ay-amount">Biten</th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.days.length === 0 && (
                     <tr>
-                      <td className="ay-empty" colSpan={7}>
+                      <td className="ay-empty" colSpan={9}>
                         — Bu ayda işlem yok —
                       </td>
                     </tr>
@@ -167,7 +172,9 @@ export default function AyPage() {
                       <td className={`ay-amount ${d.cumulativeBalance < 0 ? 'ay-negative' : ''}`}>
                         {formatSatang(d.cumulativeBalance)}
                       </td>
-                      <td className="ay-amount">{rentalText(rentalByDate.get(d.date))}</td>
+                      <td className="ay-amount">{rentalText(fleetByDate.get(d.date)?.rentalPercent)}</td>
+                      <td className="ay-amount">{countText(fleetByDate.get(d.date)?.startedReservations)}</td>
+                      <td className="ay-amount">{countText(fleetByDate.get(d.date)?.endedReservations)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -184,6 +191,8 @@ export default function AyPage() {
                     <td className={`ay-amount ${negativeFinal ? 'ay-negative' : ''}`}>
                       {formatSatang(report.finalBalance)}
                     </td>
+                    <td />
+                    <td />
                     <td />
                   </tr>
                 </tfoot>
@@ -240,6 +249,10 @@ export default function AyPage() {
               ) : (
                 <span>Eksik Gün 0</span>
               )}
+              <span className="ay-fleet-sep">|</span>
+              <span>Toplam Başlayan {countText(fleet.summary.totalStarted)}</span>
+              <span className="ay-fleet-sep">|</span>
+              <span>Toplam Biten {countText(fleet.summary.totalEnded)}</span>
             </div>
           </div>
         </>

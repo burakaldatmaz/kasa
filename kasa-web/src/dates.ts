@@ -51,6 +51,26 @@ export function formatDateLong(iso: string): string {
   })
 }
 
+/** Mobil Gün başlığı (bugün değilse): "1 Temmuz". */
+export function formatDayMonth(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('tr-TR', {
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+/** Mobil Ay listesi gün rozeti: "TEM" gibi kısa ay adı. */
+export function formatMonthShort(iso: string): string {
+  return new Date(`${iso}T00:00:00`)
+    .toLocaleDateString('tr-TR', { month: 'short' })
+    .toLocaleUpperCase('tr-TR')
+}
+
+/** Mobil Ay listesi satırı: "Çarşamba". */
+export function formatWeekday(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString('tr-TR', { weekday: 'long' })
+}
+
 /** Rapor başlığındaki uzun tarih ("3 Ağustos 2026") — PDF ile aynı biçim, haftanın günü yok. */
 export function formatDateReport(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('tr-TR', {

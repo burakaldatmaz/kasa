@@ -1,0 +1,8 @@
+Başlıklar : ['Tarih', 'Gelir', 'Gider', 'POS', 'Gün Net', 'Kümülatif Kasa', 'Kiralama %', 'Başlayan', 'Biten', None]
+Satır  2: [datetime.datetime(2026, 7, 1, 0, 0), 2700, 4640, 0, -1940, -1940, 61, None, None, None]
+Satır  3: [datetime.datetime(2026, 7, 2, 0, 0), 10768, 580, 136.5, 10051.5, 8111.5, 55.9, 7, 5, None]
+Satır  4: ['TOPLAM', 13468, 5220, 136.5, 8111.5, 8111.5, None, None, None, None]
+Satır  6: ['Ay Sonu Ana Kasa', 8111.5, None, None, None, None, None, None, None, None]
+Satır  7: ['Amornrat Thanmaen (%90)', 7300.35, None, None, None, None, None, None, None, None]
+Satır  8: ['Thanchanok Sabancıoğlu (%10)', 811.15, None, None, None, None, None, None, None, None]
+Satır 10: ['Ortalama Kiralama %', 58.5, 'Toplam Arızalı-Gün', 0, 'Eksik Gün', 0, 'Toplam Başlayan', 7, 'Toplam Biten', 5]

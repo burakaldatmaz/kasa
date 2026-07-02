@@ -35,4 +35,14 @@ public static class FleetCalculator
 
         return Math.Round(values.Average(), 1, MidpointRounding.AwayFromZero);
     }
+
+    /// <summary>
+    /// Rezervasyon sayacı ay toplamı (Faz 11): null günler ("girilmedi") toplama katılmaz;
+    /// TÜM günler null ise toplam da null — 0 "gerçekten sıfır" anlamını korur (K2).
+    /// </summary>
+    public static int? SumCounters(IEnumerable<int?> dailyCounts)
+    {
+        var values = dailyCounts.Where(c => c.HasValue).Select(c => c!.Value).ToList();
+        return values.Count == 0 ? null : values.Sum();
+    }
 }

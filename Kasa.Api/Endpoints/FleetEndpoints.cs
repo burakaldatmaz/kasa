@@ -47,6 +47,10 @@ public static class FleetEndpoints
             snapshot.TotalBikes = request.TotalBikes;
             snapshot.BrokenBikes = request.BrokenBikes;
             snapshot.RentedBikes = request.RentedBikes;
+            // Gönderilmeyen sayaç null yazılır: eski gövde eski davranışı korur,
+            // "girilmedi" durumu 0'a çevrilmez (K2).
+            snapshot.StartedReservations = request.StartedReservations;
+            snapshot.EndedReservations = request.EndedReservations;
             await db.SaveChangesAsync();
 
             return Results.Ok(ToResponse(snapshot));
@@ -79,7 +83,9 @@ public static class FleetEndpoints
         return new FleetMonthResponse(month, days, new FleetMonthSummaryResponse(
             FleetCalculator.AverageRentalPercent(days.Select(d => d.RentalPercent)),
             snapshots.Sum(s => s.BrokenBikes),
-            missingDays));
+            missingDays,
+            FleetCalculator.SumCounters(snapshots.Select(s => s.StartedReservations)),
+            FleetCalculator.SumCounters(snapshots.Select(s => s.EndedReservations))));
     }
 
     private static IResult? Validate(SaveFleetSnapshotRequest request)
@@ -91,6 +97,10 @@ public static class FleetEndpoints
             return Results.BadRequest(new ErrorResponse(
                 "Arızalı ve kiradaki bisiklet toplamı filo toplamını aşamaz."));
 
+        // Sayaçlar filo adetleriyle çapraz kısıta girmez (K1): tek kural, girilmişse >= 0 (K3).
+        if (request.StartedReservations < 0 || request.EndedReservations < 0)
+            return Results.BadRequest(new ErrorResponse("Rezervasyon sayıları negatif olamaz."));
+
         return null;
     }
 
@@ -98,12 +108,16 @@ public static class FleetEndpoints
         new(s.Date, s.TotalBikes, s.BrokenBikes, s.RentedBikes,
             FleetCalculator.RentalPercent(s.TotalBikes, s.BrokenBikes, s.RentedBikes),
             FleetCalculator.IdleBikes(s.TotalBikes, s.BrokenBikes, s.RentedBikes),
-            s.BrokenBikes > 0);
+            s.BrokenBikes > 0,
+            s.StartedReservations,
+            s.EndedReservations);
 
     /// <summary>Günlük rapora gömülen filo nesnesi (ReportEndpoints kullanır).</summary>
     internal static DailyFleetResponse ToDailyResponse(FleetSnapshot s) =>
         new(s.TotalBikes, s.BrokenBikes, s.RentedBikes,
             FleetCalculator.RentalPercent(s.TotalBikes, s.BrokenBikes, s.RentedBikes),
             FleetCalculator.IdleBikes(s.TotalBikes, s.BrokenBikes, s.RentedBikes),
-            s.BrokenBikes > 0);
+            s.BrokenBikes > 0,
+            s.StartedReservations,
+            s.EndedReservations);
 }

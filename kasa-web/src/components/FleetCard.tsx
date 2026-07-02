@@ -13,6 +13,9 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
   const [total, setTotal] = useState('')
   const [broken, setBroken] = useState('')
   const [rented, setRented] = useState('')
+  // Rezervasyon sayaçları: boş = "girilmedi" → kayıtta null gider (K2).
+  const [started, setStarted] = useState('')
+  const [ended, setEnded] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -26,6 +29,8 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
     setTotal(fleet ? String(fleet.totalBikes) : '')
     setBroken(fleet ? String(fleet.brokenBikes) : '')
     setRented(fleet ? String(fleet.rentedBikes) : '')
+    setStarted(fleet?.startedReservations != null ? String(fleet.startedReservations) : '')
+    setEnded(fleet?.endedReservations != null ? String(fleet.endedReservations) : '')
     setError(null)
   }, [date, fleet])
 
@@ -43,6 +48,9 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
         totalBikes: Number(total),
         brokenBikes: Number(broken),
         rentedBikes: Number(rented),
+        // Boş bırakılan sayaç null gider: "girilmedi" 0'a çevrilmez (K2).
+        startedReservations: started.trim() === '' ? null : Number(started),
+        endedReservations: ended.trim() === '' ? null : Number(ended),
       })
       onSaved()
     } catch (err) {
@@ -59,6 +67,12 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
         <span className="fleet-badges">
           {fleet?.rentalPercent != null && (
             <span className="badge badge-info">Kiralama %{fleet.rentalPercent.toFixed(1)}</span>
+          )}
+          {/* Rezervasyon sayaçları: ikisi de null ("girilmedi") ise rozet gizli (K2). */}
+          {fleet != null && (fleet.startedReservations != null || fleet.endedReservations != null) && (
+            <span className="badge badge-info">
+              Başlayan {fleet.startedReservations ?? '—'} · Biten {fleet.endedReservations ?? '—'}
+            </span>
           )}
           {fleet?.brokenAlert && (
             <span className="badge badge-warn">{fleet.brokenBikes} arızalı motor</span>
@@ -98,6 +112,30 @@ export default function FleetCard({ date, fleet, onSaved }: Props) {
               step={1}
               value={rented}
               onChange={e => setRented(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            <span>Başlayan</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              placeholder="—"
+              value={started}
+              onChange={e => setStarted(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            <span>Biten</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              placeholder="—"
+              value={ended}
+              onChange={e => setEnded(e.target.value)}
             />
           </label>
           <button type="submit" className="btn-primary btn-submit" disabled={saving}>

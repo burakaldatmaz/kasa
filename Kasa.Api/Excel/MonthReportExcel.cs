@@ -54,25 +54,28 @@ public static class MonthReportExcel
 
     private static void RenderSummary(IXLWorksheet ws, MonthReportResponse r, FleetMonthResponse fleet)
     {
-        WriteHeader(ws, ["Tarih", "Gelir", "Gider", "POS", "Gün Net", "Kümülatif Kasa", "Kiralama %"]);
+        WriteHeader(ws, ["Tarih", "Gelir", "Gider", "POS", "Gün Net", "Kümülatif Kasa", "Kiralama %", "Başlayan", "Biten"]);
 
-        var rentalByDate = fleet.Days.ToDictionary(d => d.Date, d => d.RentalPercent);
+        var fleetByDate = fleet.Days.ToDictionary(d => d.Date);
 
         var row = 2;
         foreach (var day in r.Days)
         {
+            var snap = fleetByDate.GetValueOrDefault(day.Date);
             DateCell(ws.Cell(row, 1), day.Date);
             MoneyCell(ws.Cell(row, 2), day.IncomeTotal);
             MoneyCell(ws.Cell(row, 3), day.ExpenseTotal);
             MoneyCell(ws.Cell(row, 4), day.PosFee);
             MoneyCell(ws.Cell(row, 5), day.DayNet);
             MoneyCell(ws.Cell(row, 6), day.CumulativeBalance);
-            RentalCell(ws.Cell(row, 7), rentalByDate.GetValueOrDefault(day.Date));
-            StripeRow(ws, row, 7);
+            RentalCell(ws.Cell(row, 7), snap?.RentalPercent);
+            CountCell(ws.Cell(row, 8), snap?.StartedReservations);
+            CountCell(ws.Cell(row, 9), snap?.EndedReservations);
+            StripeRow(ws, row, 9);
             row++;
         }
 
-        ws.Range(1, 1, row - 1, 7).SetAutoFilter();
+        ws.Range(1, 1, row - 1, 9).SetAutoFilter();
 
         // Toplam satırı: değerler API'nin Totals/FinalBalance alanlarından, burada toplanmaz.
         ws.Cell(row, 1).Value = "TOPLAM";
@@ -81,7 +84,7 @@ public static class MonthReportExcel
         MoneyCell(ws.Cell(row, 4), r.Totals.PosFee);
         MoneyCell(ws.Cell(row, 5), r.Totals.DayNet);
         MoneyCell(ws.Cell(row, 6), r.FinalBalance);
-        var totalRange = ws.Range(row, 1, row, 7);
+        var totalRange = ws.Range(row, 1, row, 9);
         totalRange.Style.Font.Bold = true;
         totalRange.Style.Border.TopBorder = XLBorderStyleValues.Double;
         totalRange.Style.Border.TopBorderColor = Navy;
@@ -92,7 +95,7 @@ public static class MonthReportExcel
         LabelMoneyRow(ws, dist + 1, PartnerLabel(r.Distribution.Partner1), r.Distribution.Partner1.AmountSatang);
         LabelMoneyRow(ws, dist + 2, PartnerLabel(r.Distribution.Partner2), r.Distribution.Partner2.AmountSatang);
 
-        // Filo ay özeti (1 satır).
+        // Filo ay özeti (1 satır). Rezervasyon toplamları server'dan hazır gelir (I1).
         var f = dist + 4;
         ws.Cell(f, 1).Value = "Ortalama Kiralama %";
         RentalCell(ws.Cell(f, 2), fleet.Summary.AvgRentalPercent);
@@ -100,6 +103,10 @@ public static class MonthReportExcel
         ws.Cell(f, 4).Value = fleet.Summary.TotalBrokenDays;
         ws.Cell(f, 5).Value = "Eksik Gün";
         ws.Cell(f, 6).Value = fleet.Summary.MissingDays;
+        ws.Cell(f, 7).Value = "Toplam Başlayan";
+        CountCell(ws.Cell(f, 8), fleet.Summary.TotalStarted, dashWhenNull: true);
+        ws.Cell(f, 9).Value = "Toplam Biten";
+        CountCell(ws.Cell(f, 10), fleet.Summary.TotalEnded, dashWhenNull: true);
 
         ws.Columns().AdjustToContents();
     }
@@ -178,6 +185,17 @@ public static class MonthReportExcel
         cell.Value = date.ToDateTime(TimeOnly.MinValue);
         cell.Style.DateFormat.Format = DateFormat;
         cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Left;
+    }
+
+    /// <summary>Rezervasyon sayacı; null = "girilmedi" → gün satırında BOŞ hücre (0'dan ayrışır, K2),
+    /// özet satırında "—" (etiket yanında boşluk yanıltıcı olurdu).</summary>
+    private static void CountCell(IXLCell cell, int? count, bool dashWhenNull = false)
+    {
+        if (count is not null)
+            cell.Value = count.Value;
+        else if (dashWhenNull)
+            cell.Value = "—";
+        cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Right;
     }
 
     /// <summary>Kiralama yüzdesi; snapshot yoksa (veya yüzde tanımsızsa) "—".</summary>

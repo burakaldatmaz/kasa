@@ -54,6 +54,9 @@ export interface DailyFleet {
   rentalPercent: number | null
   idleBikes: number
   brokenAlert: boolean
+  /** Faz 11 sayaçları: null = "girilmedi" (UI "—" gösterir), 0 = gerçekten sıfır (K2). */
+  startedReservations: number | null
+  endedReservations: number | null
 }
 
 export interface DailyReport {
@@ -121,6 +124,9 @@ export interface FleetMonthSummary {
   avgRentalPercent: number | null
   totalBrokenDays: number
   missingDays: number
+  /** Server toplar (I1); tüm günler null ise toplam da null. */
+  totalStarted: number | null
+  totalEnded: number | null
 }
 
 export interface FleetMonth {
@@ -133,6 +139,9 @@ export interface SaveFleetRequest {
   totalBikes: number
   brokenBikes: number
   rentedBikes: number
+  /** Opsiyonel (Faz 11): boş bırakılan alan null gider, server null yazar (K2). */
+  startedReservations?: number | null
+  endedReservations?: number | null
 }
 
 export class ApiError extends Error {
@@ -222,6 +231,10 @@ export function deleteTransaction(id: number): Promise<void> {
 
 export function getDailyReport(date: string): Promise<DailyReport> {
   return request(`/api/reports/daily?date=${date}`)
+}
+
+export function getFleet(date: string): Promise<FleetSnapshot> {
+  return request(`/api/fleet/${date}`)
 }
 
 export function saveFleet(date: string, req: SaveFleetRequest): Promise<FleetSnapshot> {

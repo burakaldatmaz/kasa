@@ -164,6 +164,9 @@ export default function RaporPage() {
               {report.fleet.brokenAlert && ' ⚠'}
               {' | '}Kirada {report.fleet.rentedBikes}
               {report.fleet.rentalPercent != null && ` | Kiralama %${report.fleet.rentalPercent.toFixed(1)}`}
+              {/* Rezervasyon sayaçları PDF filo şeridiyle aynı: null → "—" (K2). */}
+              {` | Başlayan ${report.fleet.startedReservations ?? '—'}`}
+              {` | Biten ${report.fleet.endedReservations ?? '—'}`}
             </p>
           ) : (
             <p className="rapor-filo rapor-filo-missing">Filo verisi girilmedi</p>

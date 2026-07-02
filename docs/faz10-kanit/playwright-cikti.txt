@@ -1,31 +1,82 @@
-PASS  a0: gün sayfasında yatay taşma yok  [scrollWidth=390]
-PASS  a1: Gün Net tutarı viewport içinde  [{"x":14,"y":801.921875,"width":166.5,"height":28.078125}]
-PASS  a2: ANA KASA tutarı viewport içinde  [{"x":209.5,"y":801.921875,"width":166.5,"height":28.078125}]
-PASS  a3: iki tutar üst üste binmiyor
-PASS  a4: bar etiketleri Gün Net + ANA KASA
-PASS  b1: detay paneli varsayılan kapalı
-PASS  b2: bara dokununca detay açılır
-PASS  b3: detayda 4 hücre (Devir/Gelir/Gider/POS)
-PASS  b4: detay tutarları taşmıyor/binmiyor
-PASS  b5: tekrar dokununca kapanır
-PASS  c1: kategori dropdown tam genişlik  [328/328]
-PASS  c2: ödeme dropdown tam genişlik  [328/328]
-PASS  c3: + Yeni Kategori tam genişlik, kategori satırının altında
-PASS  c4: Ekle butonu tam genişlik ve ≥44px
-PASS  c5: Düzenle/Sil dokunma alanı ≥44x44  [{"x":253.953125,"y":1233.5,"width":49.046875,"height":44}]
-PASS  d1: Ekle sonrası odak tutar alanında
-PASS  d2: tutar alanı sıfırlandı
-PASS  r1: rapor sayfasında yatay taşma yok  [scrollWidth=390]
-PASS  e0: ay sayfasında gövde yatay taşmıyor  [scrollWidth=390]
-PASS  e1: ay tablosu konteyner içinde yatay kaydırılabilir
-PASS  e2: kaydırınca Tarih kolonu sabit  [17→17]
-PASS  e3: diğer kolonlar gerçekten kaydı  [118.15625→-131.84375]
-PASS  f1: desktop özet barında 6 hücre görünür
-PASS  f2: mobil özet katmanı desktop’ta gizli
-PASS  f3: 6 hücre tek sırada yan yana
-PASS  f4: Gelir/Gider formları yan yana (iki sütun)
-PASS  f5: nav linkleri başlıkla aynı satırda
-PASS  f6: form alanları desktop’ta yatay dizilimde
-PASS  f7: desktop’ta ay tablosu kaydırmasız sığıyor
+— (f) Desktop 1280x800 (düzen değişmedi mi?) —
+  ✓ (f) 6 özet hücresi yan yana
+  ✓ (f) mobil özet katmanı gizli
+  ✓ (f) tab bar DOM'da yok
+  ✓ (f) FAB DOM'da yok
+  ✓ (f) formlar iki sütun
+  ✓ (f) nav başlık satırında (display:contents)
+  ✓ (f) gün desktop regresyon: piksel farkı %0.000 (0 px)
+  ✓ (f) ay desktop regresyon: piksel farkı %0.000 (0 px)
+— Mobil 390x844 —
+  (gün: 2026-07-02)
+  ✓ (a) tab bar görünür
+  ✓ (a) 4 sekme + FAB
+  ✓ (a) Ay sekmesi açıldı
+  ✓ (a) Ay sekmesi aktif renk
+  ✓ (a) Rapor sekmesi açıldı
+  ✓ (a) Filo sekmesi açıldı (stepper'lar)
+  ✓ (a) FAB giriş sheet'ini açtı
+  ✓ (a) keypad 12 tuş
+  ✓ (a) ✕ sheet'i kapattı
+— (b) keypad 1234.56 → Kaydet —
+  (seçili kategori: Kiralama)
+  ✓ (b) tutar göstergesi ฿1234.56
+  ✓ (b) ikinci nokta engellendi
+  ✓ (b) 2 ondalık sınırı
+  ✓ (b) toast "Gelir eklendi · ฿1,234.56"
+  ✓ (b) hero KASADA = API closingBalance
+  ✓ (b) hero GELİR = API incomeTotal
+  ✓ (b) hero GİDER = API expenseTotal
+  ✓ (b) hero POS = API posFee
+  ✓ (b) POS etiketi API oranından (hardcode değil)
+  ✓ (b) yeni işlem satırı listede (฿1,234.56)
+  ✓ (b) devir satırı = API previousBalance
+  ✓ (e) Gün: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Gün: 12 tutar öğesi viewport içinde
+— (c) Ekle ve devam korunumu —
+  ✓ (c) sheet açık kaldı
+  ✓ (c) tutar sıfırlandı (฿0)
+  ✓ (c) kategori korundu (Eksik Yakıt Tahsilatı)
+  ✓ (c) ödeme korundu (Havale)
+  ✓ (c) meta satırında kısaltma (Havale)
+— (d) satır → eylem sheet'i —
+  ✓ (d) eylem sheet'i açıldı
+  ✓ (d) Düzenle + Sil butonları
+  ✓ (d) dokunma alanı ≥44px
+  ✓ (d) Düzenle → düzenleme formu sheet içinde
+  ✓ (e) Eylem sheet: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Eylem sheet: 14 tutar öğesi viewport içinde
+— (g) + Yeni kategori chip akışı —
+  ✓ (g) kategori modalı sheet üstünde açıldı
+  ✓ (g) yeni chip şeritte
+  ✓ (g) yeni chip seçili geldi
+  ✓ (e) Giriş sheet: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Giriş sheet: 14 tutar öğesi viewport içinde
+  ✓ Ay hero = API finalBalance
+  ✓ Ortak kartı API'den (Amornrat Thanmaen, %90)
+  ✓ Excel butonu
+  ✓ Filo ay özeti satırı
+  ✓ R1: /api/reports/month/xlsx canlı (Excel ucu)
+  ✓ R1: /api/reports/daily/pdf canlı (PDF ucu)
+  ✓ (e) Ay: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Ay: 11 tutar öğesi viewport içinde
+  ✓ Ay günü → Rapor sekmesi açıldı
+  ✓ (e) Rapor: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Rapor: 11 tutar öğesi viewport içinde
+  ✓ Rapor: Devreden Kasa şeridi
+  ✓ Rapor: Tür Dağılımı bölümü
+  ✓ Rapor: PDF butonu
+  (filo snapshot var)
+  ✓ Filo: sayıya dokunup doğrudan yazma
+  ✓ Filo: + stepper 59→60
+  ✓ (e) Filo: yatay sayfa taşması yok (scrollWidth=390)
+  ✓ (e) Filo: 0 tutar öğesi viewport içinde
+  ✓ Gün: filo mini kartı görünür
+  ✓ Gün: filo kartı → Filo sekmesi
+— Boş gün + filo boş durumu —
+  ✓ Boş gün: başlık tarihi gösterir (3 Temmuz)
+  ✓ Boş gün: sarı uyarı kartı "filo verisi girilmedi"
+  ✓ Boş gün: liste boş durumları
+  ✓ Filo boş durumu: "Bugün için filo verisi yok" (404)
 
-SONUÇ: 29 PASS, 0 FAIL
+SONUÇ: 70 PASS / 0 FAIL

@@ -337,10 +337,18 @@ public static class DailyReportPdf
                             Divider(text);
                             text.Span($"Kiralama %{f.RentalPercent.Value.ToString("0.0", CultureInfo.InvariantCulture)}");
                         }
+
+                        // Rezervasyon sayaçları (Faz 11): null = "girilmedi" → "—" (K2).
+                        Divider(text);
+                        text.Span($"Başlayan {Count(f.StartedReservations)}");
+                        Divider(text);
+                        text.Span($"Biten {Count(f.EndedReservations)}");
                     });
                 });
             });
 
         static void Divider(TextDescriptor text) => text.Span("   |   ").FontColor(Muted);
+
+        static string Count(int? value) => value?.ToString(CultureInfo.InvariantCulture) ?? "—";
     }
 }

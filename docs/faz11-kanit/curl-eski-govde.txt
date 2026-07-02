@@ -1,0 +1,17 @@
+# Faz 11 geriye dönük uyum kanıtı: ESKİ istek gövdesi (üç alan) hâlâ çalışır,
+# rezervasyon alanları null yazılır (K2). İzole API: localhost:5268, kopya DB.
+
+$ curl -s -X POST http://localhost:5268/api/auth/login -H "Content-Type: application/json" -d '{"password":"***"}' (oturum)
+HTTP 204
+
+$ curl -i -X PUT http://localhost:5268/api/fleet/2026-07-01 -d '{"totalBikes":59,"brokenBikes":0,"rentedBikes":36}' — ESKİ GÖVDE (iki yeni alan YOK)
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Thu, 02 Jul 2026 16:17:15 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{"date":"2026-07-01","totalBikes":59,"brokenBikes":0,"rentedBikes":36,"rentalPercent":61.0,"idleBikes":23,"brokenAlert":false,"startedReservations":null,"endedReservations":null}
+
+$ curl -s http://localhost:5268/api/fleet/2026-07-01 — GET: alanlar null ("girilmedi"), 0 DEĞİL
+{"date":"2026-07-01","totalBikes":59,"brokenBikes":0,"rentedBikes":36,"rentalPercent":61.0,"idleBikes":23,"brokenAlert":false,"startedReservations":null,"endedReservations":null}

@@ -9,7 +9,7 @@ services:
     image: kasa-api
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8080:8080" # dışarıya yalnız nginx açar (deploy/nginx-kasa.bkkbike.com.conf)
+      - "127.0.0.1:8085:8080" # dışarıya yalnız apache/nginx açar
     environment:
       # TZ ÖNEMLİ: "bugün" hesapları (missingDays, varsayılan tarih) Bangkok gününe göre.
       # Container UTC kalırsa gece 00:00-07:00 arası işlemler yanlış güne yazar.

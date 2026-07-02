@@ -23,7 +23,7 @@ public static class ReportEndpoints
 
         // PDF, JSON raporuyla AYNI hesap yolunu (BuildDailyReportAsync → Domain) kullanır;
         // PDF katmanı hazır DTO'yu yalnızca dizgiye döker (I1/I2).
-        group.MapGet("/daily/pdf", async (KasaDbContext db, string? date) =>
+        group.MapGet("/daily/pdf", async (KasaDbContext db, TimeProvider clock, string? date) =>
         {
             // DateOnly binding'in gövdesiz 400'ü yerine Türkçe mesaj için string alınıp elle parse edilir.
             if (date is null || !DateOnly.TryParseExact(
@@ -32,8 +32,12 @@ public static class ReportEndpoints
                     "date parametresi zorunludur ve YYYY-AA-GG biçiminde geçerli bir tarih olmalıdır (örn: ?date=2026-08-03)."));
 
             var report = await BuildDailyReportAsync(db, day);
+            // "Oluşturma" damgası Bangkok saatidir; Bangkok DST uygulamadığından sabit UTC+7
+            // birebir doğrudur ve host'un TZ ayarından bağımsız çalışır (dev makinesi dahil).
+            var generatedAt = clock.GetUtcNow().ToOffset(TimeSpan.FromHours(7));
             return Results.File(
-                Pdf.DailyReportPdf.Render(report), "application/pdf", $"kasa-islem-{day:yyyy-MM-dd}.pdf");
+                Pdf.DailyReportPdf.Render(report, generatedAt),
+                "application/pdf", $"kasa-islem-{day:yyyy-MM-dd}.pdf");
         });
 
         group.MapGet("/month", async (KasaDbContext db, string? month) =>

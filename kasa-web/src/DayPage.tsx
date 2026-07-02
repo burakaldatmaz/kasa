@@ -108,6 +108,13 @@ export default function DayPage() {
         <a className="rapor-nav-link" href={`/ay?month=${date.slice(0, 7)}`}>
           Ay Görünümü
         </a>
+        <button
+          type="button"
+          className="btn-primary btn-small"
+          onClick={() => window.open(`/api/reports/daily/pdf?date=${date}`)}
+        >
+          PDF
+        </button>
         <LogoutButton />
       </header>
 

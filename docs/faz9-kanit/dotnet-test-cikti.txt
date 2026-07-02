@@ -1,0 +1,3 @@
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:   108, Atlanan:     0, Toplam:   108, Süre: 2 s - Kasa.Tests.dll (net10.0)

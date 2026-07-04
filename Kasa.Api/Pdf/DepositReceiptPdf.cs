@@ -25,6 +25,17 @@ public static class DepositReceiptPdf
 
     private const string Font = "Sarabun";
 
+    // ── Düzenleyen kimliği (yasal ZORUNLU footer) ────────────────────────────────────────────
+    // Gelir Vergisi K. m.105 ทวิ → düzenleyenin vergi kimlik no'su (TIN); DBD 2544 tebliği →
+    // para tahsilat belgesinde işletme adresi. İkisi de makbuzda bulunmalı. Tek yerden değişsin
+    // diye sabit; metinler birebir korunur (Thai unvan บริษัท…จำกัด, TIN 13 hane, tone: พระโขนงใต้).
+    private const string CompanyNameTh = "บริษัท บีเอ็มเอ เทค โกลบอล จำกัด";
+    private const string CompanyNameEn = "BMA Tech Global Co., Ltd.";
+    private const string CompanyTaxLabelTh = "เลขประจำตัวผู้เสียภาษี";
+    private const string CompanyTaxId = "0105567191722";
+    private const string CompanyAddress = "5 ซอยสุขุมวิท 60/1 แขวงพระโขนงใต้ เขตพระโขนง กรุงเทพมหานคร 10260";
+    private const string CompanyEmail = "hello@bkkbike.com";
+
     // ── BKKBIKE tasarım tokenları (v3/v4 ortak) ──────────────────────────────────────────────
     private static readonly Color Navy = Color.FromHex("#1F3864");
     private static readonly Color Blue = Color.FromHex("#2E75B6");
@@ -460,6 +471,11 @@ public static class DepositReceiptPdf
         });
     }
 
+    /// <summary>
+    /// Alt bilgi: solda saklama uyarısı; sağda düzenleyen kimliği iki satır (yasal zorunlu).
+    /// Satır 1 = unvan (TH·EN bold) + TIN (normal); satır 2 = işletme adresi + e-posta. Puntoyu
+    /// footer stiline göre 0.2pt kısıp (6.3) TIN satırını tek satırda tutar; kutulara dokunmaz.
+    /// </summary>
     private static void Footer(IContainer container)
     {
         container.BorderTop(1).BorderColor(LineSoft).PaddingTop(4, Unit.Millimetre).Row(row =>
@@ -467,11 +483,21 @@ public static class DepositReceiptPdf
             row.RelativeItem().AlignMiddle()
                 .Text("Keep this receipt to reclaim your deposit · เก็บใบนี้ไว้เพื่อขอรับเงินประกันคืน")
                 .FontSize(6.5f).FontColor(Muted);
-            row.AutoItem().AlignMiddle().Text(t =>
+
+            row.AutoItem().PaddingLeft(6).AlignMiddle().Column(org =>
             {
-                t.DefaultTextStyle(s => s.FontSize(6.5f).FontColor(Muted));
-                t.Span("BMA Tech Global Co., Ltd.").Bold().FontColor(Ink);
-                t.Span(" · hello@bkkbike.com");
+                org.Item().AlignRight().Text(line =>
+                {
+                    line.DefaultTextStyle(s => s.FontSize(6.3f).FontColor(Muted));
+                    line.Span(CompanyNameTh).Bold().FontColor(Ink);
+                    line.Span(" · ");
+                    line.Span(CompanyNameEn).Bold().FontColor(Ink);
+                    line.Span($" · {CompanyTaxLabelTh} ");
+                    line.Span(CompanyTaxId); // TIN: normal ağırlık
+                });
+                org.Item().PaddingTop(1).AlignRight()
+                    .Text($"{CompanyAddress} · {CompanyEmail}")
+                    .FontSize(6.3f).FontColor(Muted);
             });
         });
     }

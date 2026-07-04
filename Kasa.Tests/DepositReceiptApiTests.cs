@@ -312,6 +312,39 @@ public class DepositReceiptApiTests(KasaApiFactory factory) : IClassFixture<Kasa
 
         Assert.DoesNotContain("โทรศัพท์", text);              // Phone etiketi yok
         Assert.DoesNotContain("เลขอ้างอิง", text);             // Ref No etiketi yok
-        Assert.DoesNotContain("เลขประจำตัวผู้เสียภาษี", text);   // Tax ID etiketi yok
+        // Not: "เลขประจำตัวผู้เสียภาษี" artık footer TIN etiketinde her zaman var; müşteri Tax ID
+        // satırının yokluğunu iki dilli etiketin İngilizce başına ("Tax ID /") bakarak doğrula.
+        Assert.DoesNotContain("TaxID/", text);                // müşteri Tax ID etiketi yok
+    }
+
+    // ── PDF footer: düzenleyen TIN + Thai unvan her iki nüshada (yasal zorunlu) ────────────────
+    [Fact]
+    public async Task Pdf_Footer_HasCompanyTaxInfo()
+    {
+        var created = await PostAsync(Body(date: "2057-01-01"));
+
+        var response = await _client.GetAsync($"/api/deposit-receipts/{created.Id}/pdf");
+        var (pages, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
+
+        // PdfPig, Sarabun ToUnicode CMap'ine göre SARA AM (ำ) glifini ํ+า (nikhahit+sara aa) diye
+        // çözer; karşılaştırmadan önce beklenen Thai metni de aynı ayrışıma indir (NormThai).
+        Assert.Equal(1, pages);
+        Assert.Equal(2, CountOccurrences(text, "0105567191722"));                      // TIN, iki nüsha
+        Assert.Equal(2, CountOccurrences(text, NormThai("บริษัทบีเอ็มเอเทคโกลบอลจำกัด"))); // Thai unvan
+        Assert.Equal(2, CountOccurrences(text, "BMATechGlobalCo.,Ltd."));              // İng. unvan
+        Assert.Equal(2, CountOccurrences(text, NormThai("เลขประจำตัวผู้เสียภาษี")));       // TIN etiketi
+        Assert.Contains("แขวงพระโขนงใต้", text);                                        // adres (DBD 2544)
+    }
+
+    // PdfPig, Sarabun font'unda SARA AM (ำ) glifini nikhahit+sara aa olarak çözer.
+    private static string NormThai(string s) => s.Replace("ำ", "ํา");
+
+    private static int CountOccurrences(string haystack, string needle)
+    {
+        var count = 0;
+        for (var i = haystack.IndexOf(needle, StringComparison.Ordinal); i >= 0;
+             i = haystack.IndexOf(needle, i + needle.Length, StringComparison.Ordinal))
+            count++;
+        return count;
     }
 }

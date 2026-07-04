@@ -36,6 +36,11 @@ public static class DepositReceiptPdf
     private const string CompanyAddress = "5 ซอยสุขุมวิท 60/1 แขวงพระโขนงใต้ เขตพระโขนง กรุงเทพมหานคร 10260";
     private const string CompanyEmail = "reservations@bkkbike.com";
 
+    // Uyarı kutuları (Refundable / Usage limits / Late return) metin puntosu — okunabilirlik için
+    // v4 tasarımın 7 / 6.5pt'sinden büyütüldü. Tek sayfa ScaleToFit sigortası altında kalır.
+    private const float NoticeFont = 8.5f; // EN lead+body ve Thai satırları
+    private const float PillFont = 7.5f;   // sayısal "hap"lar (km/gün, ฿/km, saat kuralları)
+
     // ── BKKBIKE tasarım tokenları (v3/v4 ortak) ──────────────────────────────────────────────
     private static readonly Color Navy = Color.FromHex("#1F3864");
     private static readonly Color Blue = Color.FromHex("#2E75B6");
@@ -341,7 +346,7 @@ public static class DepositReceiptPdf
         {
             col.Item().Text(t =>
             {
-                t.DefaultTextStyle(s => s.FontSize(7).LineHeight(1.6f).FontColor(WarnInk));
+                t.DefaultTextStyle(s => s.FontSize(NoticeFont).LineHeight(1.6f).FontColor(WarnInk));
                 t.Span("Usage limits.").Bold().FontColor(WarnInk);
                 t.Span(" Max ");
                 Pill(t, $"{r.DailyKm} km/day", WarnInk, WarnLine);
@@ -364,7 +369,7 @@ public static class DepositReceiptPdf
                 Pill(t, "2 ฿/km", WarnInk, WarnLine);
                 t.Span(".");
             });
-            col.Item().PaddingTop(1).Text(ThaiUsage(r)).FontSize(7).LineHeight(1.4f).FontColor(InkSoft);
+            col.Item().PaddingTop(1).Text(ThaiUsage(r)).FontSize(NoticeFont).LineHeight(1.4f).FontColor(InkSoft);
         });
     }
 
@@ -386,7 +391,7 @@ public static class DepositReceiptPdf
         {
             col.Item().Text(t =>
             {
-                t.DefaultTextStyle(s => s.FontSize(7).LineHeight(1.6f).FontColor(LateBody));
+                t.DefaultTextStyle(s => s.FontSize(NoticeFont).LineHeight(1.6f).FontColor(LateBody));
                 t.Span("Late return.").Bold().FontColor(LateTitle);
                 t.Span(" First hour free · ");
                 Pill(t, "2–4 hrs · 50% of daily rate", LateTitle, LateLine);
@@ -396,7 +401,7 @@ public static class DepositReceiptPdf
             });
             col.Item().PaddingTop(1).Text(
                     "คืนรถล่าช้า — ชั่วโมงแรกไม่คิดค่าใช้จ่าย · ชั่วโมงที่ 2–4 คิด 50% ของค่าเช่ารายวัน · เกิน 4 ชม. คิดค่าเช่าเต็มวัน · การคืนรถหลังเวลาปิดร้าน 19:00 น. คิดค่าเช่าเต็มวันทุกกรณี")
-                .FontSize(7).LineHeight(1.4f).FontColor(LateBody);
+                .FontSize(NoticeFont).LineHeight(1.4f).FontColor(LateBody);
         });
     }
 
@@ -409,11 +414,11 @@ public static class DepositReceiptPdf
         {
             col.Item().Text(t =>
             {
-                t.DefaultTextStyle(s => s.FontSize(7).LineHeight(1.45f).FontColor(textColor));
+                t.DefaultTextStyle(s => s.FontSize(NoticeFont).LineHeight(1.45f).FontColor(textColor));
                 t.Span(lead).Bold().FontColor(leadColor);
                 t.Span(body);
             });
-            col.Item().PaddingTop(1).Text(thai).FontSize(7).LineHeight(1.4f).FontColor(InkSoft);
+            col.Item().PaddingTop(1).Text(thai).FontSize(NoticeFont).LineHeight(1.4f).FontColor(InkSoft);
         });
     }
 
@@ -449,7 +454,7 @@ public static class DepositReceiptPdf
             .PaddingBottom(1)
             .Background(White).Border(0.8f).BorderColor(border).CornerRadius(3)
             .PaddingHorizontal(3).PaddingVertical(0.5f)
-            .Text(value).FontSize(6.5f).SemiBold().FontColor(ink).LineHeight(1f);
+            .Text(value).FontSize(PillFont).SemiBold().FontColor(ink).LineHeight(1f);
     }
 
     private static void Signatures(IContainer container)

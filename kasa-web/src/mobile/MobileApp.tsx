@@ -3,13 +3,14 @@ import type { Category, TransactionType } from '../api'
 import { getCategories } from '../api'
 import { todayISO } from '../dates'
 import AyScreen from './AyScreen'
+import DepozitoScreen from './DepozitoScreen'
 import EntrySheet from './EntrySheet'
 import FiloScreen from './FiloScreen'
 import GunScreen from './GunScreen'
 import RaporScreen from './RaporScreen'
-import { IconAy, IconFilo, IconGun, IconPlus, IconRapor } from './icons'
+import { IconAy, IconDepozito, IconFilo, IconGun, IconPlus, IconRapor } from './icons'
 
-export type Tab = 'gun' | 'ay' | 'rapor' | 'filo'
+export type Tab = 'gun' | 'ay' | 'rapor' | 'filo' | 'depozito'
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 const MONTH_RE = /^\d{4}-\d{2}$/
@@ -33,6 +34,8 @@ function stateFromUrl(): NavState {
       return { tab: 'rapor', date, month }
     case '/filo':
       return { tab: 'filo', date, month }
+    case '/depozito':
+      return { tab: 'depozito', date, month }
     default:
       return { tab: 'gun', date, month }
   }
@@ -47,6 +50,8 @@ function urlFor(nav: NavState): string {
       return `/rapor?date=${nav.date}`
     case 'filo':
       return `/filo?date=${nav.date}`
+    case 'depozito':
+      return `/depozito?date=${nav.date}`
     default:
       return `/?date=${nav.date}`
   }
@@ -124,6 +129,7 @@ export default function MobileApp() {
     { key: 'ay', label: 'Ay', icon: IconAy },
     { key: 'rapor', label: 'Rapor', icon: IconRapor },
     { key: 'filo', label: 'Filo', icon: IconFilo },
+    { key: 'depozito', label: 'Depozito', icon: IconDepozito },
   ]
 
   function tabButton(tab: { key: Tab; label: string; icon: () => React.JSX.Element }) {
@@ -166,6 +172,15 @@ export default function MobileApp() {
       {nav.tab === 'filo' && (
         <FiloScreen date={nav.date} onChanged={refresh} showToast={showToast} />
       )}
+      {nav.tab === 'depozito' && (
+        <DepozitoScreen
+          date={nav.date}
+          tick={tick}
+          onDateChange={date => navigate({ date, month: date.slice(0, 7) })}
+          onChanged={refresh}
+          showToast={showToast}
+        />
+      )}
 
       <nav className="m-tabbar" aria-label="Ana gezinme">
         {tabButton(tabs[0])}
@@ -177,6 +192,7 @@ export default function MobileApp() {
         </div>
         {tabButton(tabs[2])}
         {tabButton(tabs[3])}
+        {tabButton(tabs[4])}
       </nav>
 
       {sheetOpen && (

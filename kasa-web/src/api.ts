@@ -1,6 +1,8 @@
 // Tek veri katmanı: tüm fetch çağrıları buradan geçer.
 // Tutarlar server'dan SATANG (number) gelir; UI hiçbir para hesabı yapmaz (I1).
 
+import type { RadiusPolicy } from './vehicles'
+
 export type TransactionType = 'Income' | 'Expense'
 export type PaymentMethod = 'Cash' | 'CreditCard' | 'BankTransfer'
 
@@ -144,6 +146,52 @@ export interface SaveFleetRequest {
   endedReservations?: number | null
 }
 
+/** Depozito makbuzu — kasa'nın mali akışıyla temassız bağımsız modül. Para satang (I1). */
+export interface DepositReceipt {
+  id: number
+  no: string
+  date: string
+  customerName: string
+  phone: string | null
+  taxId: string | null
+  vehicleModel: string
+  vehicleColor: string | null
+  plate: string
+  amountSatang: number
+  paymentMethod: PaymentMethod
+  referenceNo: string | null
+  fuelLevel: string
+  handoverAt: string
+  returnExpectedAt: string
+  limitKmPerDay: number
+  limitRadiusKm: number
+  dailyKm: number
+  radiusPolicy: string
+  createdAt: string
+}
+
+/**
+ * Amount BAHT string'dir ("3000" / "3000.50"); satang'a çeviri server'da (I1). No server atar.
+ * phone/taxId/referenceNo opsiyoneldir (boş → null). dailyKm + radiusPolicy seçilen araçtan gider;
+ * eski limit alanları (limitKmPerDay/limitRadiusKm) artık gönderilmez, server varsayılanlar.
+ */
+export interface SaveDepositReceiptRequest {
+  date: string
+  customerName: string
+  phone: string | null
+  taxId: string | null
+  vehicleModel: string
+  plate: string
+  amount: string
+  paymentMethod: PaymentMethod
+  referenceNo: string | null
+  fuelLevel: string
+  handoverAt: string
+  returnExpectedAt: string
+  dailyKm: number
+  radiusPolicy: RadiusPolicy
+}
+
 export class ApiError extends Error {
   readonly status: number
 
@@ -247,4 +295,17 @@ export function getMonthReport(month: string): Promise<MonthReport> {
 
 export function getFleetMonth(month: string): Promise<FleetMonth> {
   return request(`/api/fleet/month?month=${month}`)
+}
+
+export function getDepositReceipts(date: string): Promise<DepositReceipt[]> {
+  return request(`/api/deposit-receipts?date=${date}`)
+}
+
+export function createDepositReceipt(req: SaveDepositReceiptRequest): Promise<DepositReceipt> {
+  return request('/api/deposit-receipts', jsonInit('POST', req))
+}
+
+/** Makbuz PDF'inin URL'i — window.open ile yeni sekmede açılır (günlük rapor PDF'iyle aynı desen). */
+export function depositReceiptPdfUrl(id: number): string {
+  return `/api/deposit-receipts/${id}/pdf`
 }

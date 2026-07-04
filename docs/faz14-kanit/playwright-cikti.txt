@@ -1,0 +1,24 @@
+— Desktop 1280x900 —
+  ✓ Desktop: DayPage'de "Depozito" nav linki
+  ✓ Desktop: /depozito açıldı (form + liste)
+  ✓ Desktop: başlangıçta makbuz yok
+  ✓ Desktop: Kaydet → PDF yeni sekme açıldı (window.open)
+  ✓ Desktop: makbuz listeye düştü (No + isim + tutar)
+  ✓ Desktop: liste API ile birebir (1 makbuz)
+  ✓ Desktop: PDF ucu 200 + application/pdf + "DEP-2026-00001.pdf"
+  ✓ Desktop: ikinci makbuz numarası +1 arttı
+  ✓ Desktop: liste satırı PDF butonu makbuzu açtı (window.open)
+  ✓ Desktop: yatay taşma yok
+— Mobil 390x844 —
+  ✓ Mobil: tab barda 5 sekme
+  ✓ Mobil: "Depozito" sekmesi var
+  ✓ Mobil: Depozito ekranı açıldı
+  ✓ Mobil: günün makbuzları listede (desktop 2 makbuz)
+  ✓ Mobil: DepositSheet açıldı
+  ✓ Mobil: Kaydet → PDF yeni sekme açıldı (window.open)
+  ✓ Mobil: "Makbuz kesildi" toast'ı (No + tutar)
+  ✓ Mobil: yeni makbuz listeye düştü (3 makbuz)
+  ✓ Mobil: yatay taşma yok
+  ✓ Mali temassızlık: depozito kasayı etkilemedi (Kasada ฿0.00)
+
+SONUÇ: 20 PASS / 0 FAIL

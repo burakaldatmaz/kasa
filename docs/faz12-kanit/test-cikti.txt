@@ -1,0 +1,4 @@
+/Users/burakaldatmaz/Desktop/Projeler/günlük kasa/Kasa.Tests/bin/Debug/net10.0/Kasa.Tests.dll (.NETCoreApp,Version=v10.0) için test çalıştırması
+Toplam 1 test dosyası belirtilen desenle eşleşti.
+
+Başarılı!  - Başarısız:     0, Başarılı:    26, Atlanan:     0, Toplam:    26, Süre: 23 ms - Kasa.Tests.dll (net10.0)

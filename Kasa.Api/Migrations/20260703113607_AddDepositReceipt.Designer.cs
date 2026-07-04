@@ -3,6 +3,7 @@ using System;
 using Kasa.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kasa.Api.Migrations
 {
     [DbContext(typeof(KasaDbContext))]
-    partial class KasaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260703113607_AddDepositReceipt")]
+    partial class AddDepositReceipt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
@@ -177,9 +180,6 @@ namespace Kasa.Api.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("DailyKm")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("TEXT");
 
@@ -205,29 +205,12 @@ namespace Kasa.Api.Migrations
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Phone")
-                        .HasMaxLength(40)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Plate")
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RadiusPolicy")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ReferenceNo")
-                        .HasMaxLength(60)
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("ReturnExpectedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TaxId")
-                        .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VehicleColor")

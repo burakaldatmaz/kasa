@@ -9,6 +9,7 @@ public class KasaDbContext(DbContextOptions<KasaDbContext> options) : DbContext(
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<Setting> Settings => Set<Setting>();
     public DbSet<FleetSnapshot> FleetSnapshots => Set<FleetSnapshot>();
+    public DbSet<DepositReceipt> DepositReceipts => Set<DepositReceipt>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +46,29 @@ public class KasaDbContext(DbContextOptions<KasaDbContext> options) : DbContext(
                 t.HasCheckConstraint("CK_FleetSnapshot_Capacity",
                     "\"BrokenBikes\" + \"RentedBikes\" <= \"TotalBikes\"");
             });
+        });
+
+        modelBuilder.Entity<DepositReceipt>(e =>
+        {
+            // No UNIQUE: numara tekrarsızlığının son sigortası (eşzamanlı POST yarışında biri düşer).
+            e.HasIndex(d => d.No).IsUnique();
+            e.Property(d => d.No).HasMaxLength(20).IsRequired();
+            e.Property(d => d.CustomerName).HasMaxLength(120).IsRequired();
+            e.Property(d => d.Phone).HasMaxLength(40);
+            e.Property(d => d.TaxId).HasMaxLength(40);
+            e.Property(d => d.VehicleModel).HasMaxLength(80).IsRequired();
+            e.Property(d => d.VehicleColor).HasMaxLength(40);
+            e.Property(d => d.Plate).HasMaxLength(40).IsRequired();
+            e.Property(d => d.ReferenceNo).HasMaxLength(60);
+            e.Property(d => d.FuelLevel).HasMaxLength(20).IsRequired();
+            e.Property(d => d.RadiusPolicy).HasMaxLength(20).IsRequired();
+            // Gün listesi (yeniden yazdırma) tarih üzerinden sorgular.
+            e.HasIndex(d => d.Date);
+            // SQLite TEXT'te Kind kaybolur; CreatedAt sözleşmesi UTC'dir (Transaction ile aynı desen).
+            e.Property(d => d.CreatedAt).HasConversion(
+                v => v,
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            e.ToTable(t => t.HasCheckConstraint("CK_DepositReceipt_AmountSatang", "\"AmountSatang\" > 0"));
         });
 
         modelBuilder.Entity<Setting>(e =>

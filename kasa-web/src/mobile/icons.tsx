@@ -37,6 +37,15 @@ export function IconFilo() {
   )
 }
 
+export function IconDepozito() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.5 4 5.5v6c0 4.8 3.4 8.2 8 9.6 4.6-1.4 8-4.8 8-9.6v-6z" />
+      <path d="m9 11.5 2 2 4-4" />
+    </svg>
+  )
+}
+
 export function IconPlus() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">

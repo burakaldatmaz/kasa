@@ -71,6 +71,29 @@ export function formatWeekday(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('tr-TR', { weekday: 'long' })
 }
 
+/** "YYYY-MM-DDTHH:mm" — datetime-local input değeri (depozito teslim/iade alanları). */
+export function dateTimeLocal(iso: string, time = '09:00'): string {
+  return `${iso}T${time}`
+}
+
+/** datetime-local değerini gün olarak kaydırır ("...T09:00" → +30 gün). Saati korur. */
+export function shiftDateTimeLocalDays(value: string, days: number): string {
+  const [d, t] = value.split('T')
+  return `${shiftDate(d, days)}T${t ?? '09:00'}`
+}
+
+/** datetime-local → "3 Tem 2026 · 09:00" (mobil makbuz listesi meta satırı). */
+export function formatDateTimeShort(value: string): string {
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleString('tr-TR', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 /** Rapor başlığındaki uzun tarih ("3 Ağustos 2026") — PDF ile aynı biçim, haftanın günü yok. */
 export function formatDateReport(iso: string): string {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('tr-TR', {

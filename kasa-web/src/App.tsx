@@ -1,5 +1,6 @@
 import AyPage from './AyPage'
 import DayPage from './DayPage'
+import DepozitoPage from './DepozitoPage'
 import LoginPage from './LoginPage'
 import RaporPage from './RaporPage'
 import MobileApp from './mobile/MobileApp'
@@ -18,6 +19,8 @@ export default function App() {
       return <RaporPage />
     case '/ay':
       return <AyPage />
+    case '/depozito':
+      return <DepozitoPage />
     default:
       return <DayPage />
   }

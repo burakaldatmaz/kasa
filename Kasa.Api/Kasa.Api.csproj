@@ -24,4 +24,10 @@
     <ProjectReference Include="..\Kasa.Domain\Kasa.Domain.csproj" />
   </ItemGroup>
 
+  <!-- Sarabun (Thai dizgisi) assembly'ye gömülür: hem Docker hem test host'unda garanti bulunur,
+       host/content-root font zincirine bağlı kalmaz ("container font zincirinde yok" dersi). -->
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\*.ttf" />
+  </ItemGroup>
+
 </Project>

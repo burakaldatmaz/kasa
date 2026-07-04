@@ -101,6 +101,7 @@ app.MapCategoryEndpoints();
 app.MapTransactionEndpoints();
 app.MapReportEndpoints();
 app.MapFleetEndpoints();
+app.MapDepositReceiptEndpoints();
 
 // İzleme ucu: auth istemez, DB'ye gerçek bir sorgu atar.
 app.MapGet("/health", async (KasaDbContext db) =>

@@ -1,0 +1,2 @@
+
+Başarılı!  - Başarısız:     0, Başarılı:   158, Atlanan:     0, Toplam:   158, Süre: 1 s - Kasa.Tests.dll (net10.0)

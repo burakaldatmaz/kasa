@@ -382,8 +382,12 @@ public static class DepositReceiptPdf
 
     /// <summary>
     /// Late return kutusu (PARÇA 3): onaylı gecikme kuralı. Yumuşak kırmızı tema + sol aksan +
-    /// saat ikonu; "2–4 hrs · 50% of daily rate" ve "over 4 hrs · full day charge" pill'li (usage
-    /// kutusuyla aynı bileşen).
+    /// saat ikonu. Gecikme kuralları ("2–4 hrs · 50% of daily rate" ve "over 4 hrs · full day
+    /// charge") burada BİLEREK pill değil, inline kalın/renkli span'dir: QuestPDF inline
+    /// <see cref="Pill"/> (text.Element) kutularını span akışından SONRA çizer, bu yüzden
+    /// pdftotext/PdfPig gibi metin çıkarıcılar (ve ekran okuyucular) onları cümlenin sonuna kaydırır
+    /// ("First hour free · · . …" + kopuk pill'ler). Span kullanınca çizim sırası = okuma sırası
+    /// kalır; cümle soldan sağa kesintisiz çıkar. Görsel vurgu SemiBold + koyu kırmızıyla korunur.
     /// </summary>
     private static void LateReturnNotice(IContainer container)
     {
@@ -394,9 +398,9 @@ public static class DepositReceiptPdf
                 t.DefaultTextStyle(s => s.FontSize(NoticeFont).LineHeight(1.6f).FontColor(LateBody));
                 t.Span("Late return.").Bold().FontColor(LateTitle);
                 t.Span(" First hour free · ");
-                Pill(t, "2–4 hrs · 50% of daily rate", LateTitle, LateLine);
+                t.Span("2–4 hrs · 50% of daily rate").SemiBold().FontColor(LateTitle);
                 t.Span(" · ");
-                Pill(t, "over 4 hrs · full day charge", LateTitle, LateLine);
+                t.Span("over 4 hrs · full day charge").SemiBold().FontColor(LateTitle);
                 t.Span(". Returns after closing time (19:00) are always charged as a full extra day.");
             });
             col.Item().PaddingTop(1).Text(

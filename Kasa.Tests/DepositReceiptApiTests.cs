@@ -269,7 +269,7 @@ public class DepositReceiptApiTests(KasaApiFactory factory) : IClassFixture<Kasa
         Assert.Contains("฿/km", text); // aşım ücreti pill'i (2 ฿/km) her grupta
     }
 
-    // ── PDF late return kutusu onaylı yeni metinle (EN pill'li + TH) ──────────────────────────
+    // ── PDF late return kutusu onaylı metinle: EN cümlesi soldan sağa KESİNTİSİZ tek parça ─────
     [Fact]
     public async Task Pdf_LateReturnBox_HasApprovedText()
     {
@@ -279,9 +279,16 @@ public class DepositReceiptApiTests(KasaApiFactory factory) : IClassFixture<Kasa
         var (pages, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
 
         Assert.Equal(1, pages);
-        Assert.Contains("Firsthourfree", text);
-        Assert.Contains("50%ofdailyrate", text);   // pill
-        Assert.Contains("fulldaycharge", text);     // pill
+
+        // "First hour free" ile "full extra day." arasındaki sıra korunmalı; tam cümle TEK PARÇA
+        // geçmeli (parça parça değil). Gecikme kuralları inline span (pill değil) olduğundan çizim
+        // sırası = okuma sırası; eski pill'li kod ibareleri cümlenin sonuna kaydırıyordu — bu, o
+        // regresyonun kilididir. Ayraç · = U+00B7, tire – = U+2013 (kaynakla birebir).
+        const string enSentence =
+            "Late return. First hour free · 2–4 hrs · 50% of daily rate · over 4 hrs · full day charge. " +
+            "Returns after closing time (19:00) are always charged as a full extra day.";
+        Assert.Contains(enSentence.Replace(" ", string.Empty), text);
+
         Assert.Contains("คืนรถล่าช้า", text);         // Thai lead (Sarabun gömülü)
     }
 

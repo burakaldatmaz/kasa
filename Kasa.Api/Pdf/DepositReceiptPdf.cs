@@ -34,7 +34,7 @@ public static class DepositReceiptPdf
     private const string CompanyTaxLabelTh = "เลขประจำตัวผู้เสียภาษี";
     private const string CompanyTaxId = "0105567191722";
     private const string CompanyAddress = "5 ซอยสุขุมวิท 60/1 แขวงพระโขนงใต้ เขตพระโขนง กรุงเทพมหานคร 10260";
-    private const string CompanyEmail = "hello@bkkbike.com";
+    private const string CompanyEmail = "reservations@bkkbike.com";
 
     // ── BKKBIKE tasarım tokenları (v3/v4 ortak) ──────────────────────────────────────────────
     private static readonly Color Navy = Color.FromHex("#1F3864");

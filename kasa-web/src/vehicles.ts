@@ -20,7 +20,7 @@ export interface Vehicle {
 
 export const EXCESS_KM_FEE_THB = 2  // limit aşımı: ฿/km (tüm araçlar)
 
-export const VEHICLES: Vehicle[] = [
+const VEHICLE_LIST: Vehicle[] = [
   { plate: "8 ขพ 7303", model: "Honda ADV 160 2025 Black", dailyFee: 600, deposit: 3000, dailyKm: 250, radiusPolicy: "unlimited" },
   { plate: "8 ขผ 7250", model: "Honda ADV 160 2025 Red", dailyFee: 600, deposit: 3000, dailyKm: 250, radiusPolicy: "unlimited" },
   { plate: "1 ฆจ 4129", model: "Honda ADV 160 Black", dailyFee: 600, deposit: 3000, dailyKm: 250, radiusPolicy: "unlimited" },
@@ -81,6 +81,32 @@ export const VEHICLES: Vehicle[] = [
   { plate: "8 ขฮ 2672", model: "Honda Scoopy Red", dailyFee: 300, deposit: 3000, dailyKm: 100, radiusPolicy: "bangkok-only" },
   { plate: "1 ฆภ 1326", model: "Yamaha Nmax 155", dailyFee: 600, deposit: 3000, dailyKm: 150, radiusPolicy: "within-150" },
 ]
+
+// Dropdown model sırası (yukarıdan aşağıya):
+// Scoopy → Click 125 → Click 160 → PCX → Nmax → ADV 160 → ADV 350.
+// Aynı grup içinde araçlar plakanın sonundaki sayıya göre küçükten büyüğe sıralanır.
+function modelRank(model: string): number {
+  if (model.includes("Scoopy")) return 0
+  if (model.includes("Click 125")) return 1
+  if (model.includes("Click 160")) return 2
+  if (model.includes("PCX")) return 3
+  if (model.includes("Nmax")) return 4
+  if (model.includes("ADV 350") || model.includes("ADV350")) return 6
+  if (model.includes("ADV 160") || model.includes("ADV160")) return 5
+  return 7  // bilinmeyen model → sona
+}
+
+// Plakanın sonundaki sayı (örn. "8 ขพ 7303" → 7303); grup içi sıralama için.
+function plateNumber(plate: string): number {
+  const m = plate.match(/(\d+)\s*$/)
+  return m ? parseInt(m[1], 10) : Number.MAX_SAFE_INTEGER
+}
+
+export const VEHICLES: Vehicle[] =
+  [...VEHICLE_LIST].sort((a, b) =>
+    modelRank(a.model) - modelRank(b.model) ||
+    plateNumber(a.plate) - plateNumber(b.plate)
+  )
 
 export const VEHICLE_BY_PLATE: Record<string, Vehicle> =
   Object.fromEntries(VEHICLES.map(v => [v.plate, v]))

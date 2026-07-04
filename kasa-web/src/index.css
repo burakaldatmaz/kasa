@@ -205,11 +205,146 @@ body {
   outline-offset: -1px;
 }
 
+/* ---------- Aranabilir araç seçici (PlateSelect) ---------- */
+.plate-select {
+  position: relative;
+  width: 100%;
+}
+
+/* Dropdown olduğunu belli eden chevron (input arama kutusu; native ok yok). */
+.plate-select::after {
+  content: '';
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.plate-select__input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 26px 7px 9px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+  min-width: 0;
+}
+
+.plate-select__input:focus {
+  outline: 2px solid var(--header);
+  outline-offset: -1px;
+}
+
+.plate-select__menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 12px 28px -8px rgba(11, 18, 32, 0.28);
+}
+
+.plate-select__option {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.plate-select__option--active {
+  background: var(--row-alt);
+}
+
+.plate-select__plate {
+  font-weight: 600;
+  color: var(--header);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.plate-select__option--selected .plate-select__plate::before {
+  content: '✓ ';
+}
+
+.plate-select__model {
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plate-select__empty {
+  padding: 10px 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Mobil varyant — .m-dep-field ölçüleriyle hizalı (44px dokunma hedefi, 16px font). */
+.plate-select--mobile .plate-select__input {
+  min-height: 44px;
+  border: 1px solid #e5e5ea;
+  border-radius: 10px;
+  padding: 9px 30px 9px 12px;
+  font-size: 16px;
+  color: #0b1220;
+}
+
+.plate-select--mobile .plate-select__input:focus {
+  outline: 2px solid #1f3864;
+}
+
+.plate-select--mobile .plate-select__menu {
+  border-radius: 12px;
+  padding: 6px;
+  max-height: 46vh;
+}
+
+.plate-select--mobile .plate-select__option {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 10px;
+}
+
+.plate-select--mobile .plate-select__model {
+  font-size: 13px;
+}
+
 .form-error {
   margin: 10px 0 0;
   color: var(--danger);
   font-size: 13px;
   font-weight: 600;
+}
+
+/* Depozito formu: seçili aracın km/yarıçap kuralı (usage) güven satırı — PDF sarı kutusuyla aynı ton. */
+.dep-usage-hint {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #7a5b12;
+  background: #fffbec;
+  border: 1px solid #f0dfa6;
+  border-radius: 6px;
+  padding: 6px 10px;
 }
 
 /* ---------- Düğmeler ---------- */
@@ -2442,7 +2577,8 @@ body {
     color: #7b8794;
   }
 
-  .m-dep-field input {
+  .m-dep-field input,
+  .m-dep-field select {
     width: 100%;
     min-height: 44px;
     border: 1px solid #e5e5ea;
@@ -2454,9 +2590,21 @@ body {
     color: #0b1220;
   }
 
-  .m-dep-field input:focus {
+  .m-dep-field input:focus,
+  .m-dep-field select:focus {
     outline: 2px solid #1f3864;
     outline-offset: -1px;
+  }
+
+  .m-dep-hint {
+    margin: -2px 0 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #7a5b12;
+    background: #fffbec;
+    border: 1px solid #f0dfa6;
+    border-radius: 8px;
+    padding: 6px 10px;
   }
 
   .m-dep-save {

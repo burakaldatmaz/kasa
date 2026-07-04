@@ -17,29 +17,39 @@ public class DepositReceiptApiTests(KasaApiFactory factory) : IClassFixture<Kasa
     private static object Body(
         string date = "2026-07-03",
         string customer = "Edward Penney Beaumont",
+        string? phone = null,
+        string? taxId = null,
         string vehicle = "Honda Click 160",
         string? color = "Matte Black",
         string plate = "8 ขผ 7250",
         string amount = "3000",
         string paymentMethod = "Cash",
+        string? referenceNo = null,
         string? fuel = "Full",
         string handoverAt = "2026-07-03T11:00:00",
         string returnExpectedAt = "2026-08-02T11:00:00",
         int? limitKmPerDay = 150,
-        int? limitRadiusKm = 150) => new
+        int? limitRadiusKm = 150,
+        int? dailyKm = null,
+        string? radiusPolicy = null) => new
         {
             date,
             customerName = customer,
+            phone,
+            taxId,
             vehicleModel = vehicle,
             vehicleColor = color,
             plate,
             amount,
             paymentMethod,
+            referenceNo,
             fuelLevel = fuel,
             handoverAt,
             returnExpectedAt,
             limitKmPerDay,
-            limitRadiusKm
+            limitRadiusKm,
+            dailyKm,
+            radiusPolicy
         };
 
     private async Task<DepositReceiptResponse> PostAsync(object body)
@@ -189,5 +199,119 @@ public class DepositReceiptApiTests(KasaApiFactory factory) : IClassFixture<Kasa
     {
         var response = await _client.PostAsJsonAsync("/api/deposit-receipts", Body(amount: "-5"));
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    // ── Yeni alanlar: Phone/TaxId/ReferenceNo + DailyKm/RadiusPolicy kaydediliyor ──────────────
+    [Fact]
+    public async Task Post_PersistsNewFields()
+    {
+        var created = await PostAsync(Body(date: "2054-01-01",
+            phone: "0899990000", taxId: "TAX-123", referenceNo: "REF-9",
+            dailyKm: 100, radiusPolicy: "bangkok-only"));
+
+        Assert.Equal("0899990000", created.Phone);
+        Assert.Equal("TAX-123", created.TaxId);
+        Assert.Equal("REF-9", created.ReferenceNo);
+        Assert.Equal(100, created.DailyKm);
+        Assert.Equal("bangkok-only", created.RadiusPolicy);
+    }
+
+    // ── DailyKm/RadiusPolicy verilmezse eski sabit davranış (150 · within-150) varsayılır ──────
+    [Fact]
+    public async Task Post_DefaultsUsage_WhenOmitted()
+    {
+        var created = await PostAsync(Body(date: "2055-01-01"));
+
+        Assert.Equal(150, created.DailyKm);
+        Assert.Equal("within-150", created.RadiusPolicy);
+        Assert.Null(created.Phone);
+        Assert.Null(created.TaxId);
+        Assert.Null(created.ReferenceNo);
+    }
+
+    // ── Opsiyonel boş string'ler null'a normalize edilir ────────────────────────────────────
+    [Fact]
+    public async Task Post_EmptyOptionalStrings_NormalizeToNull()
+    {
+        var created = await PostAsync(Body(date: "2056-01-01", phone: "  ", taxId: "", referenceNo: "   "));
+
+        Assert.Null(created.Phone);
+        Assert.Null(created.TaxId);
+        Assert.Null(created.ReferenceNo);
+    }
+
+    // ── Geçersiz yarıçap politikası 400 döner ───────────────────────────────────────────────
+    [Fact]
+    public async Task Post_InvalidRadiusPolicy_Returns400()
+    {
+        var response = await _client.PostAsJsonAsync("/api/deposit-receipts", Body(radiusPolicy: "mars"));
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var error = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>(KasaApiFactory.Json);
+        Assert.Contains("yarıçap", error!["error"]);
+    }
+
+    // ── PDF usage kutusu araç grubuna göre değişir; aşım ücreti her grupta 2 ฿/km ────────────
+    [Theory]
+    [InlineData("bangkok-only", 100, "100km/day", "notallowedtogooutofBangkok")]
+    [InlineData("within-150", 150, "150km/day", "within150km")]
+    [InlineData("unlimited", 250, "250km/day", "nodistancelimit")]
+    public async Task Pdf_UsageBox_ReflectsVehicleGroup(
+        string policy, int dailyKm, string kmPhrase, string radiusPhrase)
+    {
+        var created = await PostAsync(Body(date: "2050-01-01", dailyKm: dailyKm, radiusPolicy: policy));
+
+        var response = await _client.GetAsync($"/api/deposit-receipts/{created.Id}/pdf");
+        var (pages, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
+
+        Assert.Equal(1, pages);
+        Assert.Contains(kmPhrase, text);
+        Assert.Contains(radiusPhrase, text);
+        Assert.Contains("฿/km", text); // aşım ücreti pill'i (2 ฿/km) her grupta
+    }
+
+    // ── PDF late return kutusu onaylı yeni metinle (EN pill'li + TH) ──────────────────────────
+    [Fact]
+    public async Task Pdf_LateReturnBox_HasApprovedText()
+    {
+        var created = await PostAsync(Body(date: "2051-01-01"));
+
+        var response = await _client.GetAsync($"/api/deposit-receipts/{created.Id}/pdf");
+        var (pages, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
+
+        Assert.Equal(1, pages);
+        Assert.Contains("Firsthourfree", text);
+        Assert.Contains("50%ofdailyrate", text);   // pill
+        Assert.Contains("fulldaycharge", text);     // pill
+        Assert.Contains("คืนรถล่าช้า", text);         // Thai lead (Sarabun gömülü)
+    }
+
+    // ── PDF opsiyonel alanlar: doluysa iki dilli etiketle görünür, boşsa satır hiç yok ────────
+    [Fact]
+    public async Task Pdf_OptionalFields_ShownWhenProvided()
+    {
+        var created = await PostAsync(Body(date: "2052-01-01",
+            phone: "0812345678", taxId: "0105561000000", referenceNo: "TRACE 884213"));
+
+        var response = await _client.GetAsync($"/api/deposit-receipts/{created.Id}/pdf");
+        var (_, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
+
+        Assert.Contains("0812345678", text);
+        Assert.Contains("0105561000000", text);
+        Assert.Contains("TRACE884213", text);
+        Assert.Contains("โทรศัพท์", text);   // Phone etiketi
+        Assert.Contains("เลขอ้างอิง", text);  // Ref No etiketi
+    }
+
+    [Fact]
+    public async Task Pdf_OptionalFields_HiddenWhenAbsent()
+    {
+        var created = await PostAsync(Body(date: "2053-01-01")); // phone/tax/ref yok
+
+        var response = await _client.GetAsync($"/api/deposit-receipts/{created.Id}/pdf");
+        var (_, text) = ParsePdf(await response.Content.ReadAsByteArrayAsync());
+
+        Assert.DoesNotContain("โทรศัพท์", text);              // Phone etiketi yok
+        Assert.DoesNotContain("เลขอ้างอิง", text);             // Ref No etiketi yok
+        Assert.DoesNotContain("เลขประจำตัวผู้เสียภาษี", text);   // Tax ID etiketi yok
     }
 }

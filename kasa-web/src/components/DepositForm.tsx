@@ -4,6 +4,9 @@ import type { DepositReceipt, PaymentMethod } from '../api'
 import { createDepositReceipt, depositReceiptPdfUrl, errorMessage } from '../api'
 import { dateTimeLocal, shiftDateTimeLocalDays } from '../dates'
 import { PAYMENT_METHODS } from '../labels'
+import { EXCESS_KM_FEE_THB, VEHICLE_BY_PLATE } from '../vehicles'
+import type { Vehicle } from '../vehicles'
+import PlateSelect from './PlateSelect'
 
 interface Props {
   /** Makbuz tarihi (üst tarih seçicisinden gelir; numara yılı bundan türer). */
@@ -11,26 +14,45 @@ interface Props {
   onSaved: () => void
 }
 
+/** Seçili aracın km/yarıçap kuralını tek satır Türkçe özet (form güven satırı; PDF'te İng/Thai basılır). */
+function usageHint(v: Vehicle): string {
+  const radius =
+    v.radiusPolicy === 'bangkok-only'
+      ? 'Bangkok dışına çıkış yok'
+      : v.radiusPolicy === 'within-150'
+        ? "Bangkok'tan max 150 km"
+        : 'Mesafe limiti yok'
+  return `${v.dailyKm} km/gün · ${radius} · aşım ${EXCESS_KM_FEE_THB} ฿/km`
+}
+
 /**
- * Depozito makbuzu formu. Kaydet → makbuz oluşturulur → PDF yeni sekmede açılır (Ctrl+P).
- * Tutar BAHT string gönderilir, satang'a çeviri server'da (I1). ReturnExpectedAt teslim + 30 gün
- * önerisiyle başlar; kullanıcı düzenlerse öneri geri gelmez.
+ * Depozito makbuzu formu. Araç plaka bazlı dropdown'dan seçilir; seçim model + plaka + depozito
+ * tutarını (override edilebilir) + km limitlerini otomatik doldurur. Kaydet → makbuz oluşturulur →
+ * PDF yeni sekmede açılır (Ctrl+P). Tutar BAHT string gönderilir, satang'a çeviri server'da (I1).
  */
 export default function DepositForm({ date, onSaved }: Props) {
   const [customerName, setCustomerName] = useState('')
-  const [vehicleModel, setVehicleModel] = useState('')
-  const [vehicleColor, setVehicleColor] = useState('')
+  const [phone, setPhone] = useState('')
+  const [taxId, setTaxId] = useState('')
   const [plate, setPlate] = useState('')
   const [amount, setAmount] = useState('')
+  const [referenceNo, setReferenceNo] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('Cash')
   const [fuelLevel, setFuelLevel] = useState('Full')
   const [handoverAt, setHandoverAt] = useState(() => dateTimeLocal(date))
   const [returnExpectedAt, setReturnExpectedAt] = useState(() => shiftDateTimeLocalDays(dateTimeLocal(date), 30))
   const [returnEdited, setReturnEdited] = useState(false)
-  const [limitKmPerDay, setLimitKmPerDay] = useState('150')
-  const [limitRadiusKm, setLimitRadiusKm] = useState('150')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+
+  const vehicle = plate === '' ? undefined : VEHICLE_BY_PLATE[plate]
+
+  function selectVehicle(nextPlate: string) {
+    setPlate(nextPlate)
+    // Depozito tutarı seçilen araçtan önerilir; kullanıcı sonra elle değiştirebilir.
+    const v = VEHICLE_BY_PLATE[nextPlate]
+    if (v) setAmount(String(v.deposit))
+  }
 
   function changeHandover(next: string) {
     setHandoverAt(next)
@@ -41,31 +63,38 @@ export default function DepositForm({ date, onSaved }: Props) {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (saving) return
+    if (!vehicle) {
+      setError('Araç seçin.')
+      return
+    }
     setSaving(true)
     setError(null)
     try {
       const created: DepositReceipt = await createDepositReceipt({
         date,
         customerName: customerName.trim(),
-        vehicleModel: vehicleModel.trim(),
-        vehicleColor: vehicleColor.trim() === '' ? null : vehicleColor.trim(),
-        plate: plate.trim(),
+        phone: phone.trim() === '' ? null : phone.trim(),
+        taxId: taxId.trim() === '' ? null : taxId.trim(),
+        vehicleModel: vehicle.model,
+        plate: vehicle.plate,
         amount: amount.trim(),
         paymentMethod,
+        referenceNo: referenceNo.trim() === '' ? null : referenceNo.trim(),
         fuelLevel: fuelLevel.trim() === '' ? 'Full' : fuelLevel.trim(),
         handoverAt,
         returnExpectedAt,
-        limitKmPerDay: Number(limitKmPerDay),
-        limitRadiusKm: Number(limitRadiusKm),
+        dailyKm: vehicle.dailyKm,
+        radiusPolicy: vehicle.radiusPolicy,
       })
       // PDF yeni sekmede açılır → kullanıcı Ctrl+P ile yazdırır (günlük rapor PDF deseni).
       window.open(depositReceiptPdfUrl(created.id))
-      // Bir sonraki müşteri için kimlik alanları temizlenir; ödeme/yakıt/limitler korunur.
+      // Bir sonraki müşteri için kimlik alanları temizlenir; ödeme/yakıt korunur.
       setCustomerName('')
-      setVehicleModel('')
-      setVehicleColor('')
+      setPhone('')
+      setTaxId('')
       setPlate('')
       setAmount('')
+      setReferenceNo('')
       onSaved()
     } catch (err) {
       setError(errorMessage(err))
@@ -84,6 +113,17 @@ export default function DepositForm({ date, onSaved }: Props) {
             <input value={customerName} onChange={e => setCustomerName(e.target.value)} autoComplete="off" />
           </label>
           <label className="field">
+            <span>Telefon (opsiyonel)</span>
+            <input value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" autoComplete="off" />
+          </label>
+        </div>
+
+        <div className="field-row">
+          <label className="field field-grow">
+            <span>Araç (plaka)</span>
+            <PlateSelect value={plate} onChange={selectVehicle} />
+          </label>
+          <label className="field">
             <span>Tutar (฿)</span>
             <input
               value={amount}
@@ -95,27 +135,25 @@ export default function DepositForm({ date, onSaved }: Props) {
           </label>
         </div>
 
+        {vehicle && <p className="dep-usage-hint">{usageHint(vehicle)}</p>}
+
         <div className="field-row">
+          <label className="field">
+            <span>Vergi No (opsiyonel)</span>
+            <input value={taxId} onChange={e => setTaxId(e.target.value)} autoComplete="off" />
+          </label>
           <label className="field field-grow">
-            <span>Araç modeli</span>
+            <span>Ref No (opsiyonel)</span>
             <input
-              value={vehicleModel}
-              onChange={e => setVehicleModel(e.target.value)}
-              placeholder="örn: Honda Click 160"
+              value={referenceNo}
+              onChange={e => setReferenceNo(e.target.value)}
+              placeholder="Kart: TRACE NO · Nakit/Transfer: fatura no"
               autoComplete="off"
             />
-          </label>
-          <label className="field">
-            <span>Renk (opsiyonel)</span>
-            <input value={vehicleColor} onChange={e => setVehicleColor(e.target.value)} autoComplete="off" />
           </label>
         </div>
 
         <div className="field-row">
-          <label className="field">
-            <span>Plaka</span>
-            <input value={plate} onChange={e => setPlate(e.target.value)} autoComplete="off" />
-          </label>
           <label className="field">
             <span>Ödeme yöntemi</span>
             <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value as PaymentMethod)}>
@@ -148,28 +186,7 @@ export default function DepositForm({ date, onSaved }: Props) {
               }}
             />
           </label>
-        </div>
-
-        <div className="field-row">
-          <label className="field">
-            <span>Limit (km/gün)</span>
-            <input
-              value={limitKmPerDay}
-              onChange={e => setLimitKmPerDay(e.target.value)}
-              inputMode="numeric"
-              autoComplete="off"
-            />
-          </label>
-          <label className="field">
-            <span>Limit (yarıçap km)</span>
-            <input
-              value={limitRadiusKm}
-              onChange={e => setLimitRadiusKm(e.target.value)}
-              inputMode="numeric"
-              autoComplete="off"
-            />
-          </label>
-          <button type="submit" className="btn-primary btn-submit" disabled={saving}>
+          <button type="submit" className="btn-primary btn-submit" disabled={saving || !vehicle}>
             Kaydet ve Yazdır
           </button>
         </div>
